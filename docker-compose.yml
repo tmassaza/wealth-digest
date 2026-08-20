@@ -1,0 +1,42 @@
+version: "3.9"
+
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    container_name: wealth-digest-db
+    environment:
+      POSTGRES_DB: wealth_digest
+      POSTGRES_USER: wealth_digest
+      POSTGRES_PASSWORD: wealth_digest
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U wealth_digest -d wealth_digest"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: .
+    container_name: wealth-digest-backend
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql+psycopg://wealth_digest:wealth_digest@db:5432/wealth_digest
+      MODEL_NAME: sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2
+      HF_HOME: /root/.cache/huggingface
+    volumes:
+      - .:/app
+      - huggingface_cache:/root/.cache/huggingface
+    ports:
+      - "8000:8000"
+    command: >
+      sh -c "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+
+volumes:
+  pgdata:
+  huggingface_cache:
