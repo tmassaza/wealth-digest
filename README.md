@@ -9,24 +9,22 @@ Questo repository usa `uv` come tool Python standard.
 ### Prerequisiti
 
 - Docker Desktop
-- `uv`
+- Python
+
+Se `python -m uv` non è disponibile, installa `uv` con:
+
+```powershell
+python -m pip install uv
+```
 
 ### Primo setup
 
-Se non sei gia nella root del repository, entra prima nella cartella del progetto.
+Se non sei già nella root del repository, entra prima nella cartella del progetto.
 
 ```powershell
 python -m uv python install 3.11
 python -m uv venv --python 3.11 .venv
 python -m uv sync
-```
-
-Se `uv` è già nel PATH, puoi usare la forma più corta:
-
-```powershell
-uv python install 3.11
-uv venv --python 3.11 .venv
-uv sync
 ```
 
 ### Interprete VS Code
@@ -102,7 +100,7 @@ Rollback di una migration (solo ambiente di sviluppo):
 python -m uv run alembic downgrade -1
 ```
 
-Se `uv run` è lento o resta su `Installing wheels...`, puoi usare gli equivalenti diretti:
+Se `uv run` è lento o resta su `Installing wheels...`, puoi usare direttamente il Python del venv:
 
 ```powershell
 .\.venv\Scripts\python.exe -m alembic current
