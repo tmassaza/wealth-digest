@@ -13,8 +13,9 @@ Questo repository usa `uv` come tool Python standard.
 
 ### Primo setup
 
+Se non sei gia nella root del repository, entra prima nella cartella del progetto.
+
 ```powershell
-cd wealth-digest
 python -m uv python install 3.11
 python -m uv venv --python 3.11 .venv
 python -m uv sync
