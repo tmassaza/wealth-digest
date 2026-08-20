@@ -58,7 +58,7 @@ Se vuoi eseguire subito i comandi senza attendere la sincronizzazione di `uv run
 ### Seed dei dati fake
 
 ```powershell
-python -m uv run python scripts/seed_fake_data.py
+.\.venv\Scripts\python.exe scripts\seed_fake_data.py
 ```
 
 ### Verifica rapida (compilazione e import)

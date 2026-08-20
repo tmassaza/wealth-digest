@@ -1,13 +1,19 @@
 from __future__ import annotations
 
-from sqlalchemy import create_engine
+import sys
+from pathlib import Path
+
+from sqlalchemy import create_engine, delete
 from sqlalchemy.orm import Session
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 
 from app.config import get_settings
 from app.db.base import Base
 from app.db.models import News, User
-
-EMBEDDING_DIM = 384
+from app.services.embedding_service import EmbeddingService
 
 
 def seed() -> None:
@@ -16,8 +22,13 @@ def seed() -> None:
     settings = get_settings()
     engine = create_engine(settings.database_url, pool_pre_ping=True)
     Base.metadata.create_all(bind=engine)
+    embedding_service = EmbeddingService(model_name=settings.model_name)
 
     with Session(engine) as session:
+        # Seed locale idempotente: ripartiamo sempre da un dataset pulito.
+        session.execute(delete(News))
+        session.execute(delete(User))
+
         users = [
             {"name": "Giulia Rossi", "profile_text": "utente conservativa, preferisce stabilità, basso rischio, obbligazioni investment grade, ETF difensivi e protezione dall'inflazione."},
             {"name": "Marco Bianchi", "profile_text": "utente bilanciato, cerca diversificazione globale, macroeconomia, asset allocation e settori difensivi e ciclici in equilibrio."},
@@ -41,10 +52,10 @@ def seed() -> None:
         ]
 
         for payload in users:
-            session.merge(User(**payload, embedding=[0.0] * EMBEDDING_DIM))
+            session.add(User(**payload, embedding=embedding_service.embed_text(payload["profile_text"])))
 
         for payload in news_items:
-            session.merge(News(**payload, embedding=[0.0] * EMBEDDING_DIM))
+            session.add(News(**payload, embedding=embedding_service.embed_text(payload["content_text"])))
 
         session.commit()
 

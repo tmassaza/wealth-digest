@@ -28,10 +28,10 @@ def user_recommendations(
         "top_n": top_n,
         "items": [
             {
-                "id": item.id,
-                "title": item.title,
-                "content_text": item.content_text,
-                "score": 0.0,
+                "id": item.news.id,
+                "title": item.news.title,
+                "content_text": item.news.content_text,
+                "score": round(item.score, 6),
             }
             for item in items
         ],
