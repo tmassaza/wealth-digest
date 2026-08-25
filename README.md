@@ -43,6 +43,13 @@ python -m uv run alembic upgrade head
 python -m uv run uvicorn app.main:app --reload
 ```
 
+### Indirizzi locali utili
+
+Per fare una verifica rapida a backend avviato:
+
+- Health: http://127.0.0.1:8000/health
+- Docs: http://127.0.0.1:8000/docs
+
 Nota: `uv run` verifica prima che l'ambiente sia sincronizzato con `pyproject.toml` e `uv.lock`.
 Se vedi `Installing wheels...`, non è un errore: `uv` sta preparando dipendenze mancanti.
 Nel nostro progetto questa fase può essere lenta al primo avvio.
