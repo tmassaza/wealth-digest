@@ -1,4 +1,4 @@
-version: "3.9"
+#version: "3.9" -> tolto perchè in compilazione mi dice che è obsoleto mettere la versione
 
 services:
   db:
