@@ -27,7 +27,11 @@ class News(Base):
     __tablename__ = "news"
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
-    title: Mapped[str] = mapped_column(String(255), nullable=False)
-    content_text: Mapped[str] = mapped_column(Text, nullable=False)
+    title: Mapped[str] = mapped_column(String(500), nullable=False)
+    content_text: Mapped[str] = mapped_column(Text, nullable=True)
+    summary: Mapped[str] = mapped_column(Text, nullable=True)
     embedding: Mapped[list[float]] = mapped_column(Vector(384), nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), nullable=False)
+    date: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), nullable=False)
+    link: Mapped[str] = mapped_column(String(500), nullable=False, unique=True)
+    source: Mapped[str] = mapped_column(String(500), nullable=False)
+    language: Mapped[str] = mapped_column(String(500), nullable=False)
