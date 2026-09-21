@@ -1,164 +1,127 @@
 # Wealth Digest
 
-POC minimo per il matching semantico tra profili utente e notizie, usando FastAPI, PostgreSQL e pgvector.
+Wealth Digest seleziona notizie finanziarie affini al profilo di un utente. È un progetto FastAPI con PostgreSQL e pgvector: il modello multilingue MiniLM crea gli embedding, mentre il database ordina le news per distanza coseno. L'importazione delle news usa NewsData.io; Gemini è usato separatamente per generare le notifiche.
 
-## Workflow locale standard
+Lo schema è gestito con SQLAlchemy e Alembic. `uv` gestisce Python, l'ambiente virtuale e le dipendenze definite in `pyproject.toml` e `uv.lock`.
 
-Questo repository usa `uv` come tool Python standard.
+Gli embedding hanno 384 dimensioni. Per l'utente si usa il profilo testuale; per la news si usano titolo e summary, oppure solo il titolo se il summary manca. `content_text` viene conservato, ma non contribuisce allo score.
 
-### Prerequisiti
+## Prerequisiti
 
-- Docker Desktop
-- Python
+I comandi seguenti sono per Windows PowerShell, dalla root del repository. Servono Docker Desktop, `uv`, una chiave NewsData.io per importare news e una chiave Gemini per avviare il backend e generare notifiche.
 
-Se `python -m uv` non è disponibile, installa `uv` con:
+Se `uv` non è installato, puoi installare il gestore (non una dipendenza del progetto) con:
 
 ```powershell
 python -m pip install uv
 ```
 
-### Primo setup
+## Preparare l'ambiente locale
 
-Se non sei già nella root del repository, entra prima nella cartella del progetto.
-
-```powershell
-python -m uv python install 3.11
-python -m uv venv --python 3.11 .venv
-python -m uv sync
-```
-
-### Interprete VS Code
-
-In VS Code seleziona questo interprete:
-
-`.venv\Scripts\python.exe`
-
-### Avvio in locale
-
-Usa Docker per il database e Python locale per l'app:
+Esegui questi comandi dalla root del repository:
 
 ```powershell
-docker compose up db -d
-python -m uv run alembic upgrade head
-python -m uv run uvicorn app.main:app --reload
+uv python install 3.11
 ```
 
-### Indirizzi locali utili
-
-Per fare una verifica rapida a backend avviato:
-
-- Health: http://127.0.0.1:8000/health
-- Docs: http://127.0.0.1:8000/docs
-
-Nota: `uv run` verifica prima che l'ambiente sia sincronizzato con `pyproject.toml` e `uv.lock`.
-Se vedi `Installing wheels...`, non è un errore: `uv` sta preparando dipendenze mancanti.
-Nel nostro progetto questa fase può essere lenta al primo avvio.
-
-Se vuoi eseguire subito i comandi senza attendere la sincronizzazione di `uv run`, usa direttamente il Python del venv:
+Installa Python 3.11 tramite `uv`; serve solo al primo setup, se non è già disponibile.
 
 ```powershell
-.\.venv\Scripts\python.exe -m alembic upgrade head
-.\.venv\Scripts\python.exe -m uvicorn app.main:app --reload
+uv venv --python 3.11 .venv
 ```
 
-### Seed dei dati fake
+Crea l'ambiente isolato `.venv`; eseguilo al primo setup o se devi ricreare l'ambiente.
 
 ```powershell
-.\.venv\Scripts\python.exe scripts\seed_fake_data.py
+uv sync --locked
 ```
 
-### Verifica rapida (compilazione e import)
-
-Per controllare velocemente errori sintattici nei moduli principali:
+Installa in `.venv` le dipendenze del lock file senza modificarlo; ripetilo quando cambiano le dipendenze o ricrei l'ambiente. Per aggiungere una dipendenza usa `uv add`, che aggiorna anche `pyproject.toml` e `uv.lock`.
 
 ```powershell
-python -m compileall app scripts alembic
+.\.venv\Scripts\Activate.ps1
 ```
 
-Per verificare che i pacchetti core siano risolvibili nell'ambiente:
+Attiva `.venv` in ogni nuovo terminale prima di usare i comandi `python` qui sotto. In VS Code seleziona anche `.venv\Scripts\python.exe` come interprete.
 
 ```powershell
-python -m uv run python -c "import fastapi, sqlalchemy, alembic, pgvector; print('ok')"
+Copy-Item .env.example .env
 ```
 
-### Comandi Alembic utili
+Crea la configurazione locale al primo setup. Inserisci in `.env` i valori di `NEWSDATA_API_KEY` e `GEMINI_API_KEY`; `.env` è escluso da Git. La fonte predefinita è `ilsole24ore`, modificabile tramite `NEWS_DOMAINS` o il parametro API `domain`. Non mettere chiavi reali in `.env.example`.
 
-Generare una bozza migration dai modelli (da rivedere a mano):
+## Avviare il progetto
+
+Con `.venv` attivo, usa due terminali: il primo per preparare i dati, il secondo per lasciare in esecuzione FastAPI.
 
 ```powershell
-python -m uv run alembic revision --autogenerate -m "descrizione"
+docker compose up -d db
 ```
 
-Stato attuale della migration applicata:
+Avvia PostgreSQL con pgvector; serve ogni volta che il database non è già acceso.
 
 ```powershell
-python -m uv run alembic current
+python -m alembic upgrade head
 ```
 
-Storico delle revisioni:
+Applica le migration; eseguilo al primo avvio di un database vuoto e dopo nuove migration.
 
 ```powershell
-python -m uv run alembic history
+python scripts\seed_fake_data.py
 ```
 
-Rollback di una migration (solo ambiente di sviluppo):
+Inserisce o aggiorna i sei utenti demo senza cancellare le news; è utile quando vuoi provarne le raccomandazioni.
 
 ```powershell
-python -m uv run alembic downgrade -1
+python scripts\extract_news.py
 ```
 
-Se `uv run` è lento o resta su `Installing wheels...`, puoi usare direttamente il Python del venv:
+Importa da NewsData.io le news della fonte configurata, evitando i link già presenti. Usalo quando vuoi aggiungere news reali: effettua chiamate esterne e può consumare la quota del provider.
 
 ```powershell
-.\.venv\Scripts\python.exe -m alembic current
-.\.venv\Scripts\python.exe -m alembic history
-.\.venv\Scripts\python.exe -m alembic downgrade -1
+python -m uvicorn app.main:app --reload
 ```
 
-### Spegnimento servizi Docker
+Avvia l'API locale; lascialo aperto mentre provi gli endpoint. La documentazione interattiva è su http://127.0.0.1:8000/docs.
 
-Fermare e rimuovere container e rete del progetto:
+In un altro terminale puoi verificare l'avvio e richiedere le Top 20 per l'utente con ID 1 (sostituisci l'ID se necessario):
+
+```powershell
+Invoke-RestMethod http://127.0.0.1:8000/health
+Invoke-RestMethod 'http://127.0.0.1:8000/recommendations/users/1?top_n=20'
+```
+
+Il primo comando verifica che l'API risponda; il secondo mostra le news ordinate per similarità. Per importare news dall'API, con il backend avviato, puoi usare `POST /news/extract` dalla pagina `/docs` e scegliere un dominio diverso se serve.
+
+Per fermare FastAPI premi `Ctrl+C`; per fermare il database senza cancellarne i dati:
 
 ```powershell
 docker compose down
 ```
 
-Fermare, rimuovere container/rete e anche il volume dati del database:
+## Alternativa: backend e database in Docker
 
-```powershell
-docker compose down -v
-```
-
-## Workflow Docker
-
-Per eseguire sia database sia backend in container:
+Se preferisci non usare `.venv` per avviare l'applicazione, dopo aver configurato `.env` esegui:
 
 ```powershell
 docker compose up --build
 ```
 
-Questo è il flusso di team più riproducibile, perché Python, dipendenze e PostgreSQL sono tutti definiti nel repository.
-
-## Come è costruito l'ambiente Python
-
-La cartella `.venv` viene generata dai comandi di setup, in particolare:
+Avvia entrambi i servizi; il backend applica automaticamente le migration. Quando i container sono attivi, puoi creare gli utenti demo o importare news con:
 
 ```powershell
-python -m uv venv --python 3.11 .venv
-python -m uv sync
+docker compose exec backend python scripts/seed_fake_data.py
+docker compose exec backend python scripts/extract_news.py
 ```
 
-Dentro `.venv` trovi in pratica:
+Il primo comando prepara i profili di prova; il secondo interroga NewsData.io. Per leggere i log del backend:
 
-- l'eseguibile Python dell'ambiente virtuale
-- gli script installati, come `alembic.exe` e `uvicorn.exe`
-- i pacchetti Python installati per il progetto
+```powershell
+docker compose logs -f backend
+```
 
-Questa cartella serve a isolare le dipendenze del progetto dal resto della macchina.
+Per fermare entrambi i container senza rimuovere il volume del database usa `docker compose down`.
 
-## Regole di team
+## Nota sugli embedding
 
-- Usa Python 3.11 per lo sviluppo locale.
-- Usa `uv` per gestire ambiente e lock file.
-- Non installare dipendenze del progetto manualmente senza aggiornare `pyproject.toml` e `uv.lock`.
-- Esegui le migration tramite Alembic, non modificando il database a mano.
+Cambiare modello o testo di input richiede di rigenerare **sia** gli embedding degli utenti **sia** quelli delle news. Attualmente non è presente uno script di re-embedding. Non mescolare vettori prodotti da modelli diversi.
