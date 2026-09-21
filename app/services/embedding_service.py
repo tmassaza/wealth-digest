@@ -8,6 +8,15 @@ from sentence_transformers import SentenceTransformer
 EMBEDDING_DIM = 384
 
 
+def build_news_embedding_text(title: str, summary: str | None) -> str:
+    """Costruisce il testo della news usato per il matching semantico."""
+
+    if summary and summary.strip():
+        return f"Titolo: {title}\nSummary: {summary.strip()}"
+
+    return f"Titolo: {title}"
+
+
 @lru_cache(maxsize=4)
 def _get_model(model_name: str) -> SentenceTransformer:
     model = SentenceTransformer(model_name)

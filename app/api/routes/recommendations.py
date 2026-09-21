@@ -13,7 +13,7 @@ router = APIRouter(prefix="/recommendations", tags=["recommendations"])
 @router.get("/users/{user_id}")
 def user_recommendations(
     user_id: int,
-    top_n: int = Query(default=5, ge=1, le=20),
+    top_n: int = Query(default=5, ge=1, le=50),
     db: Session = Depends(get_db),
 ) -> dict[str, object]:
     """Restituisce le top news consigliate per un utente."""
@@ -30,6 +30,7 @@ def user_recommendations(
             {
                 "id": item.news.id,
                 "title": item.news.title,
+                "summary": item.news.summary,
                 "content_text": item.news.content_text,
                 "score": round(item.score, 6),
             }

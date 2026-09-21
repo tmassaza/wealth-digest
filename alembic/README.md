@@ -38,7 +38,7 @@ Flusso consigliato:
 
 Nota pratica:
 
-- Nel tuo progetto `compare_type=True` è già attivo in `env.py`, quindi Alembic prova anche a rilevare cambi di tipo colonna.
+- Nel progetto `compare_type=True` è già attivo in `env.py`, quindi Alembic prova anche a rilevare cambi di tipo colonna.
 - Alcune modifiche complesse possono comunque richiedere intervento manuale nella migration generata.
 
 ## Struttura della cartella

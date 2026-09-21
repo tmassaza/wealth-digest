@@ -27,6 +27,10 @@ services:
         condition: service_healthy
     environment:
       DATABASE_URL: postgresql+psycopg://wealth_digest:wealth_digest@db:5432/wealth_digest
+      NEWSDATA_API_KEY: ${NEWSDATA_API_KEY}
+      NEWSDATA_BASE_URL: ${NEWSDATA_BASE_URL:-https://newsdata.io/api/1/news}
+      NEWS_DOMAINS: ${NEWS_DOMAINS:-ilsole24ore}
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
       MODEL_NAME: sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2
       HF_HOME: /root/.cache/huggingface
     volumes:

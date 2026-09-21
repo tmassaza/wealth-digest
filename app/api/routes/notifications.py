@@ -16,7 +16,7 @@ router = APIRouter(prefix="/notifications", tags=["notifications"])
 @router.get("/users/{user_id}")
 def generate_user_notification(
     user_id: int,
-    top_n: int = Query(default=5, ge=1, le=20),
+    top_n: int = Query(default=5, ge=1, le=50),
     db: Session = Depends(get_db),
 ) -> GeneratedNotification | None:
 

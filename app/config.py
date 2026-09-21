@@ -13,8 +13,9 @@ class Settings(BaseSettings):
 
     app_name: str = "wealth-digest"
     database_url: str = Field(default="postgresql+psycopg://wealth_digest:wealth_digest@localhost:5432/wealth_digest")
-    newsdata_api_key: str = "pub_7b378a6a29934e278f42b8b9916974af"
+    newsdata_api_key: str = ""
     newsdata_base_url: str = "https://newsdata.io/api/1/news"
+    news_domains: str = "ilsole24ore"
     model_name: str = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
 
 

@@ -18,16 +18,17 @@ if str(PROJECT_ROOT) not in sys.path:
 from app.config import get_settings
 from app.db.base import Base
 from app.db.models import News
-from app.services.embedding_service import EmbeddingService
+from app.services.embedding_service import EmbeddingService, build_news_embedding_text
 
 from bs4 import BeautifulSoup
 
 def extract_news(
     category: str = "business",
-    language: str = "it,en",
-    domain: str = "ilsole24ore",
+    language: str = "it",
+    domain: str | None = None,
 ) -> int:
     settings = get_settings()
+    selected_domains = domain or settings.news_domains
 
     headers = {
         "User-Agent": (
@@ -40,7 +41,7 @@ def extract_news(
         "apikey": settings.newsdata_api_key,
         "category": category,
         "language": language,
-        "domain": domain,
+        "domain": selected_domains,
     }
 
     engine = create_engine(settings.database_url, pool_pre_ping=True)
@@ -88,7 +89,9 @@ def extract_news(
                     title=title,
                     content_text=content_text,
                     summary=summary,
-                    embedding=embedding_service.embed_text(content_text),
+                    embedding=embedding_service.embed_text(
+                        build_news_embedding_text(title, summary)
+                    ),
                     date=parse_publication_date(articolo.get("pubDate")),
                     link=link,
                     source=articolo.get("source_id") or "unknown",
