@@ -1,11 +1,15 @@
 import os
 import json
 from dataclasses import dataclass
+from enum import Enum
+from pydantic import BaseModel
 
 from dotenv import load_dotenv
 from google import genai
 from google.genai.errors import ServerError
 from google.genai import types
+
+from openai import OpenAI
 
 from app.services.recommendation_service import ScoredNews
 
@@ -21,10 +25,14 @@ if not api_key:
 
 # Inizializzo il client Gemini
 client = genai.Client(api_key=api_key)
+open_ai_client = OpenAI()
 
+class LLMModel(str, Enum):
+    OPENAI = "openai"
+    GEMINI = "gemini"
+    
 
-@dataclass(slots=True)
-class GeneratedNotificationNews:
+class GeneratedNotificationNews(BaseModel):
     id: str
     title: str
     date: str
@@ -32,34 +40,31 @@ class GeneratedNotificationNews:
     relevance: str
     source: str
 
-
-@dataclass(slots=True)
-class GeneratedNotification:
+class GeneratedNotification(BaseModel):
     generated_news: list[GeneratedNotificationNews]
 
 class GenerateNotificationService:
     def __init__(self):
         pass
 
-    def build_prompt(self, profile: str, selected_articles: list[ScoredNews]) -> str:
+    def build_prompt(self, profile: str, selected_news: list[ScoredNews]) -> str:
         """
         Costruisce il prompt da inviare al modello generativo.
         """
 
-        articles_text = ""
+        news_text = ""
 
-        for article in selected_articles:
-            articles_text += f"""
-    ARTICOLO
+        for scored_news in selected_news:
+            news_text += f"""
+    NEWS
 
-    ID: {article.news.id}
-    Titolo: {article.news.title}
-    Data: {article.news.date}
-    Score di rilevanza: {article.score}
-    URL: {article.news.link}
+    ID: {scored_news.news.id}
+    Titolo: {scored_news.news.title}
+    Data: {scored_news.news.date}
+    URL: {scored_news.news.link}
 
     Contenuto:
-    {article.news.content_text}
+    {scored_news.news.content_text}
 
     ----------------------------
     """
@@ -67,33 +72,84 @@ class GenerateNotificationService:
         prompt = f"""
     Sei un assistente che prepara notifiche finanziarie
     personalizzate per i clienti di una società di investimento.
-
-    PROFILO DEL CLIENTE
-
-    {profile}
-
-
-    ARTICOLI SELEZIONATI
-
-    {articles_text}
-
-
-    COMPITO
-
-    Genera una notifica personalizzata per questo cliente.
-
+    
+    Il tuo compito si divide in DUE FASI.
+    
+    FASE 1 — SELEZIONE DELLE NOTIZIE
+    
+    Analizza tutte le notizie disponibili e seleziona esclusivamente
+    quelle che sono realmente rilevanti per questo specifico cliente.
+    
+    La selezione deve essere effettuata esclusivamente sulla base
+    della coerenza tra il profilo del cliente e il contenuto delle
+    singole notizie.
+    
+    NON devi selezionare un numero prestabilito di notizie.
+    
+    Puoi selezionare:
+    - nessuna notizia, se nessuna è sufficientemente rilevante;
+    - una sola notizia;
+    - alcune notizie;
+    - tutte le notizie, se tutte risultano realmente rilevanti.
+    
+    Non includere una notizia solamente perché è una notizia
+    finanziaria.
+    
+    Per determinare la rilevanza considera esclusivamente le
+    informazioni disponibili nel profilo del cliente e negli articoli.
+    
+    In particolare, considera quando applicabile:
+    
+    - gli interessi esplicitamente indicati nel profilo;
+    - gli strumenti finanziari indicati nel profilo;
+    - i settori di interesse;
+    - le aree geografiche di interesse;
+    - gli obiettivi esplicitamente indicati;
+    - le preferenze esplicitamente indicate;
+    - la relazione concreta tra il contenuto della notizia
+      e il profilo del cliente.
+    
+    Una notizia deve essere inclusa solo quando esiste una
+    motivazione concreta e verificabile per considerarla rilevante
+    per quel cliente.
+    
+    In caso di dubbio sulla rilevanza, non includere la notizia.
+    
+    Dopo aver selezionato le notizie rilevanti, ordinalle dalla
+    PIÙ RILEVANTE alla MENO RILEVANTE per questo specifico cliente.
+    
+    L'ordinamento deve riflettere esclusivamente la rilevanza
+    della notizia rispetto al profilo del cliente e non la data
+    dell'articolo, l'ordine con cui gli articoli sono stati forniti
+    o altri criteri non pertinenti.
+    
+    FASE 2 — GENERAZIONE DELLA NOTIFICA
+    
+    Per ogni notizia selezionata nella FASE 1, genera una
+    notifica personalizzata.
+    
     Per ogni articolo devi fornire:
-
+    
     1. Titolo
     2. Data
     3. Un sommario chiaro e conciso della notizia
-    4. Una spiegazione specifica del motivo per cui
-       la notizia è rilevante per questo cliente
+    4. Una spiegazione specifica del motivo per cui la notizia
+       è rilevante per questo cliente
     5. Il link originale dell'articolo
-
-
+    
+    
+    PROFILO DEL CLIENTE
+    
+    {profile}
+    
+    
+    ARTICOLI DISPONIBILI
+    
+    {news_text}
+    
+    
     REGOLE
-
+    
     - Usa esclusivamente le informazioni fornite.
     - Non inventare informazioni.
     - Non modificare i titoli.
@@ -101,38 +157,59 @@ class GenerateNotificationService:
     - Non inventare dati, numeri o eventi.
     - Non dare consigli di investimento.
     - Non suggerire di comprare, vendere o mantenere strumenti finanziari.
+    - Non formulare raccomandazioni di investimento implicite.
     - Spiega la rilevanza della notizia facendo riferimento
-      esclusivamente al profilo del cliente.
+      esclusivamente al profilo del cliente e al contenuto
+      dell'articolo.
     - Mantieni un linguaggio professionale e comprensibile.
-    - Tratta ogni articolo separatamente.
+    - Tratta ogni articolo selezionato separatamente.
     - Non aggiungere informazioni che non siano presenti
       negli articoli o nel profilo del cliente.
-
-
+    - Non includere articoli che non siano stati selezionati
+      nella FASE 1.
+    - Non cercare di raggiungere un numero minimo o massimo
+      di articoli.
+    - Se nessun articolo è sufficientemente rilevante,
+      restituisci una lista vuota secondo lo schema dell'API.
+    
+    
     OUTPUT
-
-    La risposta deve contenere una notifica con un elemento
-    per ogni articolo selezionato.
+    
+    La risposta deve contenere esclusivamente le notizie
+    selezionate nella FASE 1.
+    
+    Deve esserci un elemento per ogni notizia selezionata
+    e nessun elemento per le notizie non selezionate.
+    
+    Gli elementi devono essere restituiti in ordine decrescente
+    di rilevanza per il cliente: il primo elemento deve essere
+    la notizia più rilevante, l'ultimo elemento la meno rilevante
+    tra quelle selezionate.
     
     La struttura e i campi della risposta sono definiti dallo
-    schema fornito all'API Gemini. Non aggiungere campi ulteriori.
+    schema fornito all'API. Non aggiungere campi ulteriori.
 
     """
 
         return prompt
 
-    def generate_notification(
-            self,
-            profile: str,
-            selected_articles: list[ScoredNews],
-    ) -> GeneratedNotification | None:
-        """
-        Invia profilo cliente e articoli a Gemini
-        e restituisce la notifica generata.
-        """
+    def run_openai(self, prompt: str) -> GeneratedNotification:
+        try:
+            response = open_ai_client.responses.parse(
+                model="gpt-5",
+                input=prompt,
+                text_format=GeneratedNotification,
+            )
+        except Exception as error:
+            raise RuntimeError(f"Errore OpenAI: {error}")
+        notification = response.output_parsed
 
-        prompt = self.build_prompt(profile, selected_articles)
+        if notification is None:
+            raise RuntimeError("OpenAI non ha restituito alcun risultato strutturato.")
 
+        return notification
+
+    def run_gemini(self, prompt: str):
         try:
             response = client.models.generate_content(
                 model="gemini-3.6-flash",
@@ -147,16 +224,26 @@ class GenerateNotificationService:
 
         response_text = response.text
         if response_text is None:
-            raise RuntimeError("Gemini non ha restituito alcun testo.")
+           raise RuntimeError("Gemini non ha restituito alcun testo.")
         try:
-            data = json.loads(response_text)
+           data = json.loads(response_text)
         except json.JSONDecodeError:
-            raise ValueError(f"Gemini ha restituio un JSON non valido:\n {response_text}")
+           raise ValueError(f"Gemini ha restituio un JSON non valido:\n {response_text}")
         notification = GeneratedNotification(
             generated_news=[
-                GeneratedNotificationNews(**generated_news)
-                for generated_news in data["generated_news"]
+                   GeneratedNotificationNews(**generated_news)
+                   for generated_news in data["generated_news"]
             ]
         )
-
         return notification
+
+    def generate_notification(
+            self,
+            profile: str,
+            selected_news: list[ScoredNews],
+            llm_model: LLMModel = LLMModel.OPENAI
+    ) -> GeneratedNotification | None:
+
+        prompt = self.build_prompt(profile, selected_news)
+
+        return self.run_openai(prompt) if llm_model is LLMModel.OPENAI else self.run_gemini(prompt)
