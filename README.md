@@ -1,6 +1,6 @@
 # Wealth Digest
 
-Wealth Digest seleziona notizie finanziarie affini al profilo di un utente. È un progetto FastAPI con PostgreSQL e pgvector: il modello multilingue MiniLM crea gli embedding, mentre il database ordina le news per distanza coseno. L'importazione delle news usa NewsData.io; Gemini è usato separatamente per generare le notifiche.
+Wealth Digest seleziona notizie finanziarie affini al profilo di un utente. È un progetto FastAPI con PostgreSQL e pgvector: il modello multilingue MiniLM crea gli embedding, mentre il database ordina le news per distanza coseno. L'importazione delle news usa NewsData.io; OpenAI o Gemini generano separatamente le notifiche.
 
 Lo schema è gestito con SQLAlchemy e Alembic. `uv` gestisce Python, l'ambiente virtuale e le dipendenze definite in `pyproject.toml` e `uv.lock`.
 
@@ -8,7 +8,7 @@ Gli embedding hanno 384 dimensioni. Per l'utente si usa il profilo testuale; per
 
 ## Prerequisiti
 
-I comandi seguenti sono per Windows PowerShell, dalla root del repository. Servono Docker Desktop, `uv`, una chiave NewsData.io per importare news e una chiave Gemini per avviare il backend e generare notifiche.
+I comandi seguenti sono per Windows PowerShell, dalla root del repository. Servono Docker Desktop e `uv`. La chiave NewsData.io serve per importare news; per generare notifiche serve la chiave del modello scelto, OpenAI oppure Gemini. Le chiavi LLM non servono per avviare l'API o consultare le raccomandazioni.
 
 Se `uv` non è installato, puoi installare il gestore (non una dipendenza del progetto) con:
 
@@ -48,7 +48,7 @@ Attiva `.venv` in ogni nuovo terminale prima di usare i comandi `python` qui sot
 Copy-Item .env.example .env
 ```
 
-Crea la configurazione locale al primo setup. Inserisci in `.env` i valori di `NEWSDATA_API_KEY` e `GEMINI_API_KEY`; `.env` è escluso da Git. La fonte predefinita è `ilsole24ore`, modificabile tramite `NEWS_DOMAINS` o il parametro API `domain`. Non mettere chiavi reali in `.env.example`.
+Crea la configurazione locale al primo setup. Inserisci in `.env` `NEWSDATA_API_KEY` se importi news e `OPENAI_API_KEY` oppure `GEMINI_API_KEY` se generi notifiche; puoi lasciare vuota la chiave del modello che non usi. `.env` è escluso da Git. La fonte predefinita è `ilsole24ore`, modificabile tramite `NEWS_DOMAINS` o il parametro API `domain`. Non mettere chiavi reali in `.env.example`.
 
 ## Avviare il progetto
 
@@ -93,6 +93,8 @@ Invoke-RestMethod 'http://127.0.0.1:8000/recommendations/users/1?top_n=20'
 
 Il primo comando verifica che l'API risponda; il secondo mostra le news ordinate per similarità. Per importare news dall'API, con il backend avviato, puoi usare `POST /news/extract` dalla pagina `/docs` e scegliere un dominio diverso se serve.
 
+La rotta `GET /notifications/users/{user_id}` importa per impostazione predefinita nuove news, passa le 10 più affini al modello scelto (`llm_model=openai` di default, oppure `llm_model=gemini`) e salva la notifica. Per provarla senza una nuova importazione usa `extract_news=false`. Ogni chiamata può generare una nuova notifica e consumare quota delle API esterne.
+
 Per fermare FastAPI premi `Ctrl+C`; per fermare il database senza cancellarne i dati:
 
 ```powershell
@@ -107,7 +109,9 @@ Se preferisci non usare `.venv` per avviare l'applicazione, dopo aver configurat
 docker compose up --build
 ```
 
-Avvia entrambi i servizi; il backend applica automaticamente le migration. Quando i container sono attivi, puoi creare gli utenti demo o importare news con:
+Avvia database e backend. Il Dockerfile prepara l'immagine installando le dipendenze indicate in `uv.lock`; non inserisce le chiavi API nell'immagine.
+
+Quando avvii i container, Docker Compose legge dal tuo `.env` locale `NEWSDATA_API_KEY`, `OPENAI_API_KEY` e `GEMINI_API_KEY` e le passa al backend. Il backend applica automaticamente le migration. Poi puoi creare gli utenti demo o importare news con:
 
 ```powershell
 docker compose exec backend python scripts/seed_fake_data.py

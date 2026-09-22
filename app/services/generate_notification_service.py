@@ -1,6 +1,5 @@
 import os
 import json
-from dataclasses import dataclass
 from enum import Enum
 from pydantic import BaseModel
 
@@ -14,18 +13,6 @@ from openai import OpenAI
 from app.services.recommendation_service import ScoredNews
 
 load_dotenv()
-
-api_key = os.getenv("GEMINI_API_KEY")
-
-if not api_key:
-    raise RuntimeError(
-        "GEMINI_API_KEY non trovata. "
-        "Controlla di aver creato il file .env nella root del progetto."
-    )
-
-# Inizializzo il client Gemini
-client = genai.Client(api_key=api_key)
-open_ai_client = OpenAI()
 
 class LLMModel(str, Enum):
     OPENAI = "openai"
@@ -194,8 +181,13 @@ class GenerateNotificationService:
         return prompt
 
     def run_openai(self, prompt: str) -> GeneratedNotification:
+        api_key = os.getenv("OPENAI_API_KEY")
+        if not api_key:
+            raise RuntimeError("OPENAI_API_KEY non trovata: configura la chiave per usare OpenAI.")
+
         try:
-            response = open_ai_client.responses.parse(
+            client = OpenAI(api_key=api_key)
+            response = client.responses.parse(
                 model="gpt-5",
                 input=prompt,
                 text_format=GeneratedNotification,
@@ -210,7 +202,12 @@ class GenerateNotificationService:
         return notification
 
     def run_gemini(self, prompt: str):
+        api_key = os.getenv("GEMINI_API_KEY")
+        if not api_key:
+            raise RuntimeError("GEMINI_API_KEY non trovata: configura la chiave per usare Gemini.")
+
         try:
+            client = genai.Client(api_key=api_key)
             response = client.models.generate_content(
                 model="gemini-3.6-flash",
                 contents=prompt,

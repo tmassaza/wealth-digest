@@ -1,33 +1,25 @@
 from __future__ import annotations
 
-import sys
-import requests
 import time
 from datetime import datetime, timezone
-from sqlalchemy import select
 
-from pathlib import Path
-
-from sqlalchemy import create_engine
+import requests
+from bs4 import BeautifulSoup
+from sqlalchemy import create_engine, select
 from sqlalchemy.orm import Session
-
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
-if str(PROJECT_ROOT) not in sys.path:
-    sys.path.insert(0, str(PROJECT_ROOT))
 
 from app.config import get_settings
 from app.db.models import News
-from app.services.embedding_service import EmbeddingService
+from app.services.embedding_service import EmbeddingService, build_news_embedding_text
 
-from bs4 import BeautifulSoup
 
 class ExtractNewsService:
-    def __init__(self):
-        pass
-
-    def extract_news(self, category: str = "business",
-                     language: str = "it,en",
-                     domain: str = 'ilsole24ore,milanofinanza,quifinanza,cnbc,yahoo') -> int:
+    def extract_news(
+        self,
+        category: str = "business",
+        language: str = "it",
+        domain: str | None = None,
+    ) -> int:
         settings = get_settings()
 
         headers = {
@@ -41,7 +33,7 @@ class ExtractNewsService:
             "apikey": settings.newsdata_api_key,
             "category": category,
             "language": language,
-            "domain": domain,
+            "domain": domain or settings.news_domains,
         }
 
         engine = create_engine(settings.database_url, pool_pre_ping=True)
@@ -80,16 +72,18 @@ class ExtractNewsService:
 
                     summary = articolo.get("description")
                     content_text = (
-                            self.extract_article_text(link, headers)
-                            or summary
-                            or title
+                        self.extract_article_text(link, headers)
+                        or summary
+                        or title
                     )
 
                     news = News(
                         title=title,
                         content_text=content_text,
                         summary=summary,
-                        embedding=embedding_service.embed_text(content_text),
+                        embedding=embedding_service.embed_text(
+                            build_news_embedding_text(title, summary)
+                        ),
                         date=self.parse_publication_date(articolo.get("pubDate")),
                         link=link,
                         source=articolo.get("source_id") or "unknown",
@@ -118,10 +112,8 @@ class ExtractNewsService:
 
         try:
             parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
-
             if parsed.tzinfo is None:
                 parsed = parsed.replace(tzinfo=timezone.utc)
-
             return parsed
         except ValueError:
             return datetime.now(timezone.utc)
@@ -169,4 +161,3 @@ class ExtractNewsService:
         except requests.exceptions.RequestException as error:
             print(f"Errore durante lo scraping di {url}: {error}")
             return None
-

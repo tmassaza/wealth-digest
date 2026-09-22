@@ -8,9 +8,9 @@ from sqlalchemy.orm import Session
 from app.db import User
 from app.db.models import Notification, NotificationNews
 from app.db.session import get_db
+from app.services.extract_news_service import ExtractNewsService
 from app.services.generate_notification_service import GenerateNotificationService, GeneratedNotification, LLMModel
 from app.services.recommendation_service import RecommendationService
-from app.services.extract_news_service import ExtractNewsService
 
 router = APIRouter(prefix="/notifications", tags=["notifications"])
 
@@ -29,7 +29,7 @@ def generate_user_notification(
 
     if extract_news:
         try:
-            ExtractNewsService().extract_news(category='business', language='it', domain='ilsole24ore,milanofinanza,quifinanza,cnbc,yahoo')
+            ExtractNewsService().extract_news(category="business", language="it")
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
 

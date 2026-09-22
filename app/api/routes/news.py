@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session
 from app.db.models import News
 from app.db.session import get_db
 from app.services.embedding_service import EmbeddingService, build_news_embedding_text
-from scripts.extract_news import extract_news
+from app.services.extract_news_service import ExtractNewsService
 
 router = APIRouter(prefix="/news", tags=["news"])
 
@@ -64,7 +64,7 @@ def extract_news_endpoint(
     """Importa news dalle fonti configurate o dai domini richiesti."""
 
     return {
-        "inserted_count": extract_news(
+        "inserted_count": ExtractNewsService().extract_news(
             category=category,
             language=language,
             domain=domain,
