@@ -1,0 +1,36 @@
+{
+  "dataset_version": 1,
+  "synthetic": true,
+  "users": [
+    {
+      "id": "U01",
+      "name": "Giulia Rossi",
+      "profile_text": "utente conservativa, preferisce stabilità, basso rischio, obbligazioni investment grade, ETF difensivi e protezione dall'inflazione."
+    },
+    {
+      "id": "U02",
+      "name": "Marco Bianchi",
+      "profile_text": "utente bilanciato, cerca diversificazione globale, macroeconomia, asset allocation e settori difensivi e ciclici in equilibrio."
+    },
+    {
+      "id": "U03",
+      "name": "Elena Conti",
+      "profile_text": "utente orientata alla crescita, interessata a tecnologia, AI, cloud, semiconduttori e trend globali azionari."
+    },
+    {
+      "id": "U04",
+      "name": "Luca Ferri",
+      "profile_text": "utente focalizzato sul reddito, segue dividendi, utility, infrastrutture e bond corporate di qualita."
+    },
+    {
+      "id": "U05",
+      "name": "Sara Romano",
+      "profile_text": "utente dinamica, valuta small cap, mercati emergenti e strategie fattoriali con orizzonte lungo."
+    },
+    {
+      "id": "U06",
+      "name": "Davide Moretti",
+      "profile_text": "utente prudente ma curioso, combina liquidita, BTP, ETF obbligazionari e quota selettiva azionaria."
+    }
+  ]
+}

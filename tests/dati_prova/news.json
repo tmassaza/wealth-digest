@@ -1,0 +1,306 @@
+{
+  "dataset_version": 1,
+  "synthetic": true,
+  "news": [
+    {
+      "id": "N001",
+      "title": "Titoli di Stato indicizzati ai prezzi: come cambia la protezione del capitale reale",
+      "summary": "Una simulazione confronta cedole legate all'inflazione e titoli a tasso fisso in diversi scenari di aumento del costo della vita."
+    },
+    {
+      "id": "N002",
+      "title": "Obbligazioni societarie solide: rendimenti e rischio di credito a confronto",
+      "summary": "Emissioni di imprese con rating elevato offrono cedole regolari, ma durata e spread possono modificare il valore prima della scadenza."
+    },
+    {
+      "id": "N003",
+      "title": "Fondi azionari a bassa volatilità sotto esame nei ribassi",
+      "summary": "Uno studio confronta la tenuta di portafogli che selezionano società meno oscillanti con quella di un indice azionario ampio."
+    },
+    {
+      "id": "N004",
+      "title": "Scadenze brevi o lunghe per i bond pubblici europei?",
+      "summary": "La scelta della durata incide sulla sensibilità ai tassi e sulla stabilità del prezzo dei titoli governativi."
+    },
+    {
+      "id": "N005",
+      "title": "Il mercato delle obbligazioni ad alto rendimento sconta più insolvenze",
+      "summary": "I rendimenti elevati attirano l'attenzione, ma gli analisti segnalano un aumento del rischio per gli emittenti meno affidabili."
+    },
+    {
+      "id": "N006",
+      "title": "Conti deposito e fondi monetari: il costo della liquidità parcheggiata",
+      "summary": "Un confronto considera tassi netti, tempi di accesso al denaro e possibili variazioni dei rendimenti nel breve periodo."
+    },
+    {
+      "id": "N007",
+      "title": "Lo spread dei governativi torna al centro delle scelte prudenti",
+      "summary": "Una maggiore differenza di rendimento tra Paesi può offrire cedole più alte, ma espone anche a oscillazioni di prezzo."
+    },
+    {
+      "id": "N008",
+      "title": "Mutui per la seconda casa: aumentano le richieste nelle località turistiche",
+      "summary": "Le agenzie immobiliari descrivono nuove preferenze delle famiglie per abitazioni vicino alle mete di vacanza."
+    },
+    {
+      "id": "N009",
+      "title": "Imprese sanitarie stabili durante una fase di mercato incerta",
+      "summary": "Ricavi ricorrenti e domanda poco ciclica sostengono alcune società quotate del settore salute, pur senza eliminare il rischio azionario."
+    },
+    {
+      "id": "N010",
+      "title": "Tagli dei tassi: quali effetti su obbligazioni e azioni difensive",
+      "summary": "Un'analisi ipotetica confronta la reazione dei prezzi dei bond con quella dei comparti azionari meno sensibili al ciclo."
+    },
+    {
+      "id": "N011",
+      "title": "Portafoglio globale misto: quando azioni e bond si muovono insieme",
+      "summary": "La diversificazione fra mercati e strumenti può ridursi in alcune fasi; un ribilanciamento periodico cambia l'esposizione complessiva."
+    },
+    {
+      "id": "N012",
+      "title": "Rotazione in Borsa dai beni essenziali all'industria",
+      "summary": "Gli investitori valutano se la ripresa della produzione favorisca i settori legati al ciclo rispetto a quelli più stabili."
+    },
+    {
+      "id": "N013",
+      "title": "Dollaro e rendimenti americani spostano gli equilibri dei listini mondiali",
+      "summary": "Valuta e tassi statunitensi possono cambiare il peso relativo delle borse europee e asiatiche in un portafoglio internazionale."
+    },
+    {
+      "id": "N014",
+      "title": "Materie prime nel portafoglio: protezione o nuova fonte di oscillazioni?",
+      "summary": "Uno scenario di rialzo dei prezzi energetici mostra benefici e limiti di una piccola esposizione alle commodity."
+    },
+    {
+      "id": "N015",
+      "title": "Le borse mondiali diventano più correlate nei momenti di stress",
+      "summary": "Una ricerca esamina quanto la diversificazione geografica aiuti davvero quando i principali mercati azionari scendono insieme."
+    },
+    {
+      "id": "N016",
+      "title": "Recessione moderata: confronto tra portafogli bilanciati e concentrati",
+      "summary": "Simulazioni su crescita debole confrontano perdite potenziali di azioni, titoli pubblici e combinazioni dei due."
+    },
+    {
+      "id": "N017",
+      "title": "Oro e attività tradizionali: la diversificazione non è costante",
+      "summary": "Il metallo prezioso può reagire diversamente a inflazione, tassi reali e avversione al rischio, secondo lo scenario considerato."
+    },
+    {
+      "id": "N018",
+      "title": "La banca centrale discute i tassi, senza nuove indicazioni sui mercati",
+      "summary": "Il comunicato ripete la necessità di osservare i prossimi dati macroeconomici, ma non segnala cambiamenti concreti di politica monetaria."
+    },
+    {
+      "id": "N019",
+      "title": "Commissioni degli ETF multi-asset: piccole differenze nel lungo periodo",
+      "summary": "Un confronto tra prodotti diversificati mostra come costi ricorrenti e frequenza dei ribilanciamenti incidano sul risultato finale."
+    },
+    {
+      "id": "N020",
+      "title": "Turismo urbano: aumentano le prenotazioni per i weekend culturali",
+      "summary": "Albergatori e musei osservano nuove abitudini di viaggio nelle città d'arte; l'articolo non tratta titoli quotati o investimenti."
+    },
+    {
+      "id": "N021",
+      "title": "Più server per i modelli generativi: crescono gli ordini di chip avanzati",
+      "summary": "I grandi operatori dei centri dati aumentano gli investimenti in capacità di calcolo, favorendo fornitori di processori e memoria."
+    },
+    {
+      "id": "N022",
+      "title": "Macchinari per la produzione di chip: ordini legati ai nuovi impianti",
+      "summary": "Le imprese che forniscono attrezzature per fabbriche di semiconduttori valutano l'espansione della capacità produttiva mondiale."
+    },
+    {
+      "id": "N023",
+      "title": "Software aziendale in abbonamento: ricavi trainati dai servizi remoti",
+      "summary": "Una società tecnologica ipotetica aumenta i clienti enterprise e la spesa per infrastrutture cloud, con effetti sui margini."
+    },
+    {
+      "id": "N024",
+      "title": "Automazione intelligente nelle imprese: il mercato guarda ai ricavi",
+      "summary": "Gli investitori distinguono tra annunci sull'intelligenza artificiale e contratti commerciali che possono sostenere la crescita."
+    },
+    {
+      "id": "N025",
+      "title": "Centri dati e rete elettrica: nuovi investimenti per sostenere la domanda",
+      "summary": "La crescita delle infrastrutture digitali richiede energia e connessioni di rete, creando opportunità e costi per operatori tecnologici e utility."
+    },
+    {
+      "id": "N026",
+      "title": "Piattaforme di sicurezza informatica: contratti ricorrenti in crescita",
+      "summary": "La domanda delle aziende per proteggere servizi digitali sostiene le vendite di software, mentre aumenta la concorrenza tra fornitori."
+    },
+    {
+      "id": "N027",
+      "title": "Valutazioni delle società tecnologiche sotto pressione per i tassi",
+      "summary": "Un aumento dei rendimenti obbligazionari può pesare sui titoli con utili attesi soprattutto negli anni futuri."
+    },
+    {
+      "id": "N028",
+      "title": "Nuove funzioni dei telefoni attirano l'attenzione dei consumatori",
+      "summary": "Una rassegna di prodotti descrive schermi e fotocamere, senza discutere bilanci delle imprese o andamento dei titoli."
+    },
+    {
+      "id": "N029",
+      "title": "Robotica industriale: società minori cercano capitale per espandersi",
+      "summary": "Produttori di sensori e software per fabbriche automatizzate valutano nuovi finanziamenti e mercati esteri."
+    },
+    {
+      "id": "N030",
+      "title": "Indici azionari mondiali sempre più concentrati nei giganti digitali",
+      "summary": "La crescita delle grandi piattaforme modifica il peso della tecnologia nei fondi globali e il rischio di concentrazione."
+    },
+    {
+      "id": "N031",
+      "title": "Società elettriche regolamentate confermano la politica dei dividendi",
+      "summary": "Entrate prevedibili dalle reti sostengono le cedole, mentre i nuovi investimenti possono ridurre la cassa disponibile."
+    },
+    {
+      "id": "N032",
+      "title": "Concessioni autostradali: pedaggi e manutenzione guidano i flussi di cassa",
+      "summary": "Gli operatori infrastrutturali confrontano entrate ricorrenti e spese necessarie per mantenere le reti nel tempo."
+    },
+    {
+      "id": "N033",
+      "title": "Prestiti obbligazionari di grandi imprese: cedole contro rischio emittente",
+      "summary": "Il confronto tra titoli con rating elevato mette in evidenza copertura degli interessi e scadenze del debito."
+    },
+    {
+      "id": "N034",
+      "title": "Una società telefonica riduce la cedola agli azionisti",
+      "summary": "La decisione libera risorse per investire nella rete, ma modifica le prospettive di reddito per chi detiene il titolo."
+    },
+    {
+      "id": "N035",
+      "title": "Reti di distribuzione energetica: ricavi prevedibili e nuove spese",
+      "summary": "Un piano pluriennale combina tariffe regolate, manutenzione e investimenti che potrebbero incidere sui dividendi futuri."
+    },
+    {
+      "id": "N036",
+      "title": "Fondi immobiliari quotati distribuiscono utili, ma il debito pesa",
+      "summary": "La tenuta delle distribuzioni dipende dagli affitti incassati e dal costo dei finanziamenti degli immobili commerciali."
+    },
+    {
+      "id": "N037",
+      "title": "Rinnovabili e reti: un operatore pianifica investimenti e cedole",
+      "summary": "La società deve bilanciare crescita degli impianti, debito e remunerazione periodica degli azionisti."
+    },
+    {
+      "id": "N038",
+      "title": "Banche: utili destinati in parte a dividendi e riacquisti",
+      "summary": "Il consiglio valuta quanto capitale restituire ai soci e quanto conservare per affrontare eventuali perdite sui prestiti."
+    },
+    {
+      "id": "N039",
+      "title": "Scadenze del debito aziendale: rifinanziarsi costa di più",
+      "summary": "Le imprese con obbligazioni in maturazione potrebbero dover pagare cedole più alte, con effetti sulla solidità finanziaria."
+    },
+    {
+      "id": "N040",
+      "title": "Servizi idrici locali: obbligazioni per ammodernare le reti",
+      "summary": "Un operatore di infrastrutture essenziali valuta emissioni a lunga scadenza sostenute dai flussi tariffari."
+    },
+    {
+      "id": "N041",
+      "title": "Piccole società esportatrici asiatiche attirano nuovi capitali",
+      "summary": "Le imprese quotate di dimensioni ridotte cercano crescita all'estero, ma restano esposte a valute e liquidità di mercato."
+    },
+    {
+      "id": "N042",
+      "title": "Fattori value e momentum: risultati diversi nei cicli di mercato",
+      "summary": "Una simulazione di lungo periodo confronta strategie azionarie basate su valutazioni contenute e forza dei prezzi."
+    },
+    {
+      "id": "N043",
+      "title": "Debito dei Paesi emergenti in valuta locale: opportunità e rischio cambio",
+      "summary": "Rendimenti potenzialmente elevati devono essere confrontati con inflazione, liquidità e oscillazioni delle valute."
+    },
+    {
+      "id": "N044",
+      "title": "Imprese manifatturiere di media taglia crescono nel Sud-est asiatico",
+      "summary": "Nuove filiere produttive aprono mercati alle società quotate regionali, pur con rischi politici e commerciali."
+    },
+    {
+      "id": "N045",
+      "title": "Mercati di frontiera: scambi sottili amplificano la volatilità",
+      "summary": "Un'analisi esamina la difficoltà di acquistare o vendere titoli di borse poco liquide durante fasi di tensione."
+    },
+    {
+      "id": "N046",
+      "title": "Aziende europee di piccola taglia con bilanci solidi",
+      "summary": "Una selezione basata su redditività e debito contenuto cerca opportunità oltre i grandi titoli dell'indice."
+    },
+    {
+      "id": "N047",
+      "title": "ETF multifattoriali: ribilanciamenti e costi nascosti",
+      "summary": "La combinazione di qualità, dimensione e trend dei prezzi cambia nel tempo e può generare più compravendite del previsto."
+    },
+    {
+      "id": "N048",
+      "title": "Consumi in India: valutazioni elevate per i titoli minori",
+      "summary": "La crescita dei ricavi non elimina il rischio di pagare prezzi eccessivi per società poco seguite dagli analisti."
+    },
+    {
+      "id": "N049",
+      "title": "Fintech latinoamericane: espansione digitale e raccolta di capitale",
+      "summary": "Operatori finanziari giovani puntano a nuovi clienti e mercati, affrontando volatilità valutaria e regolatoria."
+    },
+    {
+      "id": "N050",
+      "title": "Prezzi delle case nelle città universitarie: le zone più richieste",
+      "summary": "L'articolo descrive affitti e compravendite residenziali per famiglie e studenti, senza analizzare strumenti finanziari."
+    },
+    {
+      "id": "N051",
+      "title": "Titoli pubblici italiani a scadenze distribuite per gestire i rimborsi",
+      "summary": "Una strategia a scaletta confronta cedole, reinvestimento e disponibilità periodica del capitale."
+    },
+    {
+      "id": "N052",
+      "title": "ETF di obbligazioni a breve durata: costi e oscillazioni a confronto",
+      "summary": "L'analisi considera commissioni, qualità degli emittenti e sensibilità dei prezzi a un cambiamento dei tassi."
+    },
+    {
+      "id": "N053",
+      "title": "Buoni del Tesoro o conto remunerato per la liquidità di breve termine",
+      "summary": "Scadenza, tassazione e possibilità di rientrare in possesso dei soldi distinguono le due soluzioni."
+    },
+    {
+      "id": "N054",
+      "title": "Fondi obbligazionari: perché il prezzo cambia anche con cedole stabili",
+      "summary": "La durata media dei titoli nel paniere spiega parte delle perdite o dei guadagni quando variano i tassi."
+    },
+    {
+      "id": "N055",
+      "title": "Titoli di Stato italiani legati all'inflazione: cedole e rivalutazione",
+      "summary": "Una guida confronta protezione dal rincaro dei prezzi, scadenze e rischio di vendere prima del rimborso."
+    },
+    {
+      "id": "N056",
+      "title": "Una piccola quota di grandi azioni mondiali in un portafoglio prudente",
+      "summary": "Un esempio illustra come aggiungere esposizione azionaria senza concentrare tutto il rischio su un solo settore."
+    },
+    {
+      "id": "N057",
+      "title": "Differenziale tra BTP e Bund: cosa cambia per chi detiene titoli italiani",
+      "summary": "Un ampliamento dello spread può far scendere il prezzo delle obbligazioni già in portafoglio prima della scadenza."
+    },
+    {
+      "id": "N058",
+      "title": "Depositi vincolati: tasso più alto in cambio di minore flessibilità",
+      "summary": "Le condizioni di svincolo e la durata dell'impegno contano quanto il rendimento pubblicizzato."
+    },
+    {
+      "id": "N059",
+      "title": "Obbligazioni estere coperte dal cambio: il costo della protezione",
+      "summary": "Un fondo diversificato riduce l'esposizione valutaria, ma la copertura può assorbire parte del rendimento."
+    },
+    {
+      "id": "N060",
+      "title": "Piccolo albergo rinnova le camere per la stagione estiva",
+      "summary": "Il racconto segue i lavori e le prenotazioni di una struttura turistica locale, senza parlare di mercati o investimenti."
+    }
+  ]
+}
