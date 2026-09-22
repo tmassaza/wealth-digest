@@ -9,7 +9,12 @@ from app.db import User
 from app.db.models import Notification, NotificationNews
 from app.db.session import get_db
 from app.services.extract_news_service import ExtractNewsService
-from app.services.generate_notification_service import GenerateNotificationService, GeneratedNotification, LLMModel
+from app.services.generate_notification_service import (
+    GenerateNotificationService,
+    GeneratedNotification,
+    InvalidGeneratedNewsError,
+    LLMModel,
+)
 from app.services.recommendation_service import RecommendationService
 
 router = APIRouter(prefix="/notifications", tags=["notifications"])
@@ -37,10 +42,12 @@ def generate_user_notification(
 
     try:
         notification = GenerateNotificationService().generate_notification(user.profile_text, items, llm_model)
+    except InvalidGeneratedNewsError as error:
+        raise HTTPException(status_code=502, detail=str(error)) from error
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-    if notification is not None:
+    if notification is not None and notification.generated_news:
         created_at = datetime.now(timezone.utc)
         db_notification = Notification(
             user_id=user.id,

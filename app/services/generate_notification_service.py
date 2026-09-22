@@ -30,6 +30,51 @@ class GeneratedNotificationNews(BaseModel):
 class GeneratedNotification(BaseModel):
     generated_news: list[GeneratedNotificationNews]
 
+
+class InvalidGeneratedNewsError(ValueError):
+    """La risposta dell'LLM contiene una news non presente tra le candidate."""
+
+
+def validate_generated_notification(
+    notification: GeneratedNotification,
+    selected_news: list[ScoredNews],
+) -> GeneratedNotification:
+    """Accetta solo news proposte al modello e ripristina i dati originali."""
+    candidates = {item.news.id: item.news for item in selected_news}
+    seen_ids: set[int] = set()
+    validated_news: list[GeneratedNotificationNews] = []
+
+    for generated_news in notification.generated_news:
+        try:
+            news_id = int(generated_news.id)
+        except (TypeError, ValueError) as error:
+            raise InvalidGeneratedNewsError(
+                f"L'LLM ha restituito un ID di news non valido: {generated_news.id!r}."
+            ) from error
+
+        news = candidates.get(news_id)
+        if news is None:
+            raise InvalidGeneratedNewsError(
+                f"L'LLM ha restituito la news {news_id}, non presente tra le candidate."
+            )
+        if news_id in seen_ids:
+            continue
+
+        seen_ids.add(news_id)
+        validated_news.append(
+            GeneratedNotificationNews(
+                id=str(news_id),
+                title=news.title,
+                date=str(news.date),
+                summary=generated_news.summary,
+                relevance=generated_news.relevance,
+                source=news.link,
+            )
+        )
+
+    return GeneratedNotification(generated_news=validated_news)
+
+
 class GenerateNotificationService:
     def __init__(self):
         pass
@@ -243,4 +288,5 @@ class GenerateNotificationService:
 
         prompt = self.build_prompt(profile, selected_news)
 
-        return self.run_openai(prompt) if llm_model is LLMModel.OPENAI else self.run_gemini(prompt)
+        notification = self.run_openai(prompt) if llm_model is LLMModel.OPENAI else self.run_gemini(prompt)
+        return validate_generated_notification(notification, selected_news)
