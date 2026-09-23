@@ -63,7 +63,15 @@ class ExtractNewsService:
                 response.raise_for_status()
                 dati = response.json()
 
+                newsdata_ids = (articolo["article_id"] for articolo in dati.get("results") or [])
+                news_db = session.query(News).filter(News.newsdata_id.in_(newsdata_ids)).all()
+                news_db_newsdata_ids = (news.newsdata_id for news in news_db or [])
+
                 for articolo in dati.get("results") or []:
+
+                    if articolo["article_id"] in news_db_newsdata_ids:
+                        continue
+
                     title = articolo.get("title")
                     link = articolo.get("link")
 
@@ -88,6 +96,7 @@ class ExtractNewsService:
                         link=link,
                         source=articolo.get("source_id") or "unknown",
                         language=articolo.get("language") or "unknown",
+                        newsdata_id=articolo.get("article_id")
                     )
 
                     session.add(news)

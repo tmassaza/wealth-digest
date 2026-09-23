@@ -22,8 +22,6 @@ router = APIRouter(prefix="/notifications", tags=["notifications"])
 @router.get("/users/{user_id}")
 def generate_user_notification(
     user_id: int,
-    extract_news: bool = Query(default=True, description="Parametro utilizzato in fase di testing; impostare a False per evitare di recuperare e salvare a db news duplicate."
-                                                         "Rimuovere in futuro"),
     llm_model: LLMModel = Query(default=LLMModel.OPENAI, description="Parametro utilizzato in fase di testing per fare confronto openai e gemini. Rimuovere in futuro"),
     db: Session = Depends(get_db),
 ) -> GeneratedNotification | None:
@@ -31,12 +29,10 @@ def generate_user_notification(
     user = db.get(User, user_id)
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
-
-    if extract_news:
-        try:
-            ExtractNewsService().extract_news(category="business", language="it")
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=str(e))
+    try:
+        ExtractNewsService().extract_news(category='business', language='it', domain='ilsole24ore,milanofinanza,quifinanza,cnbc,yahoo')
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
     items = RecommendationService(db).top_news_for_user(user_id=user_id, top_n=10)
 

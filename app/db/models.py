@@ -35,6 +35,7 @@ class News(Base):
     link: Mapped[str] = mapped_column(String(500), nullable=False, unique=True)
     source: Mapped[str] = mapped_column(String(500), nullable=False)
     language: Mapped[str] = mapped_column(String(500), nullable=False)
+    newsdata_id: Mapped[str] = mapped_column(Text, nullable=True)
 
 class Notification(Base):
     """Notifiche generate per ogni utente"""
