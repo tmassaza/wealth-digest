@@ -29,10 +29,6 @@ def generate_user_notification(
     user = db.get(User, user_id)
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
-    try:
-        ExtractNewsService().extract_news(category='business', language='it', domain='ilsole24ore,milanofinanza,quifinanza,cnbc,yahoo')
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
 
     items = RecommendationService(db).top_news_for_user(user_id=user_id, top_n=10)
 

@@ -59,7 +59,7 @@ def create_news(
 def extract_news_endpoint(
     category: str = Query(default="business"),
     language: str = Query(default="it"),
-    domain: str | None = Query(default=None),
+    domain: str | None = Query(default='ilsole24ore,milanofinanza,quifinanza,cnbc,yahoo'),
 ) -> dict[str, object]:
     """Importa news dalle fonti configurate o dai domini richiesti."""
 
