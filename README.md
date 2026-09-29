@@ -129,3 +129,13 @@ Per fermare entrambi i container senza rimuovere il volume del database usa `doc
 ## Nota sugli embedding
 
 Cambiare modello o testo di input richiede di rigenerare **sia** gli embedding degli utenti **sia** quelli delle news. Attualmente non è presente uno script di re-embedding. Non mescolare vettori prodotti da modelli diversi.
+
+## Test del modello di embedding
+
+Per eseguire il test MiniLM sui 6 profili e sulle 60 news sintetiche:
+
+```powershell
+python -m tests.evaluate_retrieval
+```
+
+Il comando mostra un riepilogo nel terminale e aggiorna `tests/reports/risultati-minilm.md`. Non richiede database o chiavi API. Per metodologia, dettaglio di un singolo utente e limiti del test, consulta [tests/README.md](tests/README.md).
