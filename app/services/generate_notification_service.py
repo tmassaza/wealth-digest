@@ -27,8 +27,12 @@ class GeneratedNotificationNews(BaseModel):
     relevance: str
     source: str
 
-class GeneratedNotification(BaseModel):
+class UserGeneratedNotification(BaseModel):
     generated_news: list[GeneratedNotificationNews]
+
+class GeneratedNotification(BaseModel):
+    user_id: int
+    notification: UserGeneratedNotification
 
 
 class InvalidGeneratedNewsError(ValueError):
@@ -36,9 +40,9 @@ class InvalidGeneratedNewsError(ValueError):
 
 
 def validate_generated_notification(
-    notification: GeneratedNotification,
+    notification: UserGeneratedNotification,
     selected_news: list[ScoredNews],
-) -> GeneratedNotification:
+) -> UserGeneratedNotification:
     """Accetta solo news proposte al modello e ripristina i dati originali."""
     candidates = {item.news.id: item.news for item in selected_news}
     seen_ids: set[int] = set()
@@ -72,7 +76,7 @@ def validate_generated_notification(
             )
         )
 
-    return GeneratedNotification(generated_news=validated_news)
+    return UserGeneratedNotification(generated_news=validated_news)
 
 
 class GenerateNotificationService:
@@ -225,7 +229,7 @@ class GenerateNotificationService:
 
         return prompt
 
-    def run_openai(self, prompt: str) -> GeneratedNotification:
+    def run_openai(self, prompt: str) -> UserGeneratedNotification:
         api_key = os.getenv("OPENAI_API_KEY")
         if not api_key:
             raise RuntimeError("OPENAI_API_KEY non trovata: configura la chiave per usare OpenAI.")
@@ -235,7 +239,7 @@ class GenerateNotificationService:
             response = client.responses.parse(
                 model="gpt-5",
                 input=prompt,
-                text_format=GeneratedNotification,
+                text_format=UserGeneratedNotification,
             )
         except Exception as error:
             raise RuntimeError(f"Errore OpenAI: {error}")
@@ -258,7 +262,7 @@ class GenerateNotificationService:
                 contents=prompt,
                 config=types.GenerateContentConfig(
                     response_mime_type="application/json",
-                    response_schema=GeneratedNotification,
+                    response_schema=UserGeneratedNotification,
                 )
             )
         except ServerError as error:
@@ -271,7 +275,7 @@ class GenerateNotificationService:
            data = json.loads(response_text)
         except json.JSONDecodeError:
            raise ValueError(f"Gemini ha restituio un JSON non valido:\n {response_text}")
-        notification = GeneratedNotification(
+        notification = UserGeneratedNotification(
             generated_news=[
                    GeneratedNotificationNews(**generated_news)
                    for generated_news in data["generated_news"]
@@ -284,7 +288,7 @@ class GenerateNotificationService:
             profile: str,
             selected_news: list[ScoredNews],
             llm_model: LLMModel = LLMModel.OPENAI
-    ) -> GeneratedNotification | None:
+    ) -> UserGeneratedNotification | None:
 
         prompt = self.build_prompt(profile, selected_news)
 
