@@ -62,6 +62,7 @@ class NotificationNews(Base):
     news_id: Mapped[int] = mapped_column(ForeignKey("news.id"), nullable=False, index=True)
     summary: Mapped[str] = mapped_column(Text, nullable=False)
     relevance: Mapped[str] = mapped_column(Text, nullable=False)
+    relevance_user: Mapped[str] = mapped_column(Text, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
 
     notification: Mapped["Notification"] = relationship(back_populates="notification_news")

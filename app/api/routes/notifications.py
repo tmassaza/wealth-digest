@@ -49,6 +49,8 @@ def generate_users_notification(
     for user in users:
         user_notification = generate_notification(user, False, db)
 
+        if user_notification is None:
+            continue
         if type(user_notification) is not UserGeneratedNotification:
             raise HTTPException(status_code=500, detail="Errore imprevisto")
 
@@ -114,6 +116,7 @@ def generate_notification(
                     news_id=int(generated_news.id),
                     summary=generated_news.summary,
                     relevance=generated_news.relevance,
+                    relevance_user=generated_news.relevance_user,
                     created_at=created_at,
                 )
                 for generated_news in notification.generated_news

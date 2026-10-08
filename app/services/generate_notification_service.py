@@ -25,6 +25,7 @@ class GeneratedNotificationNews(BaseModel):
     date: str
     summary: str
     relevance: str
+    relevance_user: str
     source: str
 
 class UserGeneratedNotification(BaseModel):
@@ -72,6 +73,7 @@ def validate_generated_notification(
                 date=str(news.date),
                 summary=generated_news.summary,
                 relevance=generated_news.relevance,
+                relevance_user=generated_news.relevance_user,
                 source=news.link,
             )
         )
@@ -169,9 +171,15 @@ class GenerateNotificationService:
     1. Titolo
     2. Data
     3. Un sommario chiaro e conciso della notizia
-    4. Una spiegazione specifica del motivo per cui la notizia
-       è rilevante per questo cliente
-    5. Il link originale dell'articolo
+    4. relevance: una spiegazione dettagliata e specifica del motivo
+    per cui la notizia è rilevante per questo cliente.
+    5. relevance_user: una spiegazione molto breve, semplice e naturale
+    pensata per essere mostrata direttamente al cliente, che spieghi
+    perché questa notizia può essere interessante per lui.
+    Ad es. se l'utente ha interessi su AI e semiconduttori, la relevance_user potrebbe essere:
+    "Questo articolo è in linea con i tuoi interessi in AI, cloud e semiconduttori: se queste trattative andranno 
+    a buon fine, potrebbero accelerare gli investimenti in data center e sostenere la domanda di chip."
+    6. Il link originale dell'articolo
     
     
     PROFILO DEL CLIENTE
@@ -197,6 +205,12 @@ class GenerateNotificationService:
     - Spiega la rilevanza della notizia facendo riferimento
       esclusivamente al profilo del cliente e al contenuto
       dell'articolo.
+    - Il campo relevance_user deve essere sempre formulato come testo
+      destinato direttamente al cliente e non come spiegazione del
+      processo di selezione della notizia.
+    -Per il campo relevance_user fai riferimento, quando possibile, allo specifico interesse,
+      strumento, settore, area geografica o obiettivo presente
+      nel profilo del cliente.
     - Mantieni un linguaggio professionale e comprensibile.
     - Tratta ogni articolo selezionato separatamente.
     - Non aggiungere informazioni che non siano presenti
