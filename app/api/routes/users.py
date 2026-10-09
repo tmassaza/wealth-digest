@@ -47,6 +47,22 @@ def update_user(user_id: int, payload: UserUpdate, db: Session = Depends(get_db)
     return {"id": user.id, "name": user.name, "profile_text": user.profile_text}
 
 
+@router.get("/")
+def get_users(db: Session = Depends(get_db)) -> list[dict[str, object]]:
+    """Recupera tutti gli utenti"""
+
+    users = db.query(User).all()
+
+    return [
+        {
+            "id": user.id,
+            "name": user.name,
+            "profile_text": user.profile_text,
+            "notification_interval_days": user.notification_interval_days
+        }
+        for user in users
+    ]
+
 @router.get("/{user_id}")
 def get_user(user_id: int, db: Session = Depends(get_db)) -> dict[str, object]:
     """Recupera un utente per id."""
@@ -54,4 +70,6 @@ def get_user(user_id: int, db: Session = Depends(get_db)) -> dict[str, object]:
     user = db.get(User, user_id)
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
-    return {"id": user.id, "name": user.name, "profile_text": user.profile_text}
+    return {"id": user.id, "name": user.name, "profile_text": user.profile_text,
+            "notification_interval_days": user.notification_interval_days}
+
