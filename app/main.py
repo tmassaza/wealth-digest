@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.routes.health import router as health_router
 from app.api.routes.news import router as news_router
@@ -15,6 +16,16 @@ app.include_router(news_router)
 app.include_router(recommendations_router)
 app.include_router(notifications_router)
 
+origins = [
+    "http://localhost:4200"
+]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/")
 def root() -> dict[str, str]:
