@@ -1,0 +1,57 @@
+<div class="container">
+
+    <a href="">
+        <div class="flex gap-2 items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
+                class="text-slate-800">
+                <path d="M19 12H5" />
+                <path d="M12 19l-7-7 7-7" />
+            </svg>
+            <span class="text-slate-800">Torna alla selezione utenti</span>
+        </div>
+    </a>
+
+    @if (user()) {
+    <div class="pt-5">
+        <app-user-info-card [user]="user()" [isLoading]="isLoading()"
+        [notificationsCount]="notificationsCount()"
+            (generateNewNotificationEvent)="generateNewNotification()"></app-user-info-card>
+    </div>
+    }
+
+    @if (generateNewNotificationError()) {
+    <div class="mt-5 p-3 bg-red-100 border border-red-400 text-red-700 relative rounded-xl" role="alert">
+        <span class="block sm:inline">{{generateNewNotificationError()}}</span>
+        <span class="absolute top-0 bottom-0 right-0 px-4 py-3">
+            <svg (click)="closeErrorBanner()" class="cursor-pointer fill-current h-6 w-6 text-red-500" role="button" xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20">
+                <title>Close</title>
+                <path
+                    d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z" />
+            </svg>
+        </span>
+    </div>
+    }
+
+    @if (lastNotificationDate()) {
+    <div class="titles pt-5">
+        <h1 class="font-serif text-[19px] font-bold leading-tight
+                   text-[#17243a] sm:text-[20px]">
+            Ultima notifica generata
+        </h1>
+        <h3 class="text-[16px] text-slate-500 sm:text-[16px] ">
+            Generata il {{lastNotificationDate()}} - {{numberNotificationNews()}} notizie aggregate
+        </h3>
+    </div>
+
+    <div class="pt-2 border-t border-gray-200"></div>
+
+    <div class="news-section pt-3">
+        @for (notificationNews of lastNotificationNews(); track $index) {
+        <div class="pt-3"><app-news-card [news]="notificationNews"></app-news-card></div>
+        }
+    </div>
+    }
+
+</div>

@@ -1,0 +1,30 @@
+<style>
+  main {
+    width: 100%;
+    min-height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1rem;
+    box-sizing: inherit;
+    position: relative;
+  }
+
+  .content {
+    width: 100%;
+    max-width: 1000px;
+    margin-bottom: 3rem;
+  }
+
+  @media screen and (max-width: 650px) {
+    .content {
+      width: max-content;
+    }
+  }
+</style>
+<app-navbar></app-navbar>
+<main class="main">
+  <div class="content">
+    <router-outlet />
+  </div>
+</main>
