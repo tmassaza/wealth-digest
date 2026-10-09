@@ -1,0 +1,70 @@
+<div class="container m-auto">
+    @if(users()) {
+    <div class="header text-center">
+        <div>
+            <h2 class="font-serif text-[40px] font-bold leading-tight
+                   text-[#17243a] sm:text-[40px]">
+                Selezione profilo utente
+            </h2>
+        </div>
+        <div class="p-10 pt-3">
+            <h3 class="font-serif text-[18px] leading-tight
+                   text-gray-700 sm:text-[18px]">
+                Scegli un profilo operativo per simulare le notifiche generate e testare l'esperienza utente
+                personalizzata</h3>
+        </div>
+
+
+    </div>
+    <div class="flex flex-wrap gap-2 justify-around">
+        @for (user of users(); track $index) {
+        <div class="w-full md:w-md rounded-xl border border-[#e8ebf5] bg-white
+           px-5 py-5 sm:px-7 sm:py-6
+           shadow-[0_2px_8px_rgba(30,41,80,0.06)]">
+            <div class="m-auto text-center h-50">
+                <div class="icon flex justify-center">
+                    <img class="h-15" src="icons/icons8-user-{{$index}}.png" alt="">
+                </div>
+                <div class="pt-3 name font-serif text-[20px] font-bold leading-tight
+                   text-[#17243a] sm:text-[20px]">
+                    <h1>{{user.name}}</h1>
+                </div>
+                <div class="p-3 profile font-serif text-[16px] leading-tight
+                   text-gray-700 sm:text-[16px]">
+                    <h4>{{user.profile_text}}</h4>
+                </div>
+                <div class="frequence">
+                    <span class="font-bold text-[#25334a]">
+                        Frequenza Notifiche:
+                    </span>
+
+                    @if (user.notification_interval_days == 1) {
+                    <span class="ml-1">
+                        Una notifica ogni giorno
+                    </span>
+                    }@else {
+                    <span class="ml-1">
+                        Una notifica ogni {{user.notification_interval_days}} giorni
+                    </span>
+                    }
+                </div>
+            </div>
+            <div class="text-center pt-5">
+                <button type="button" class="cursor-pointer 
+                rounded-lg bg-[#392bd5]
+                 px-4 py-3
+                 text-sm font-semibold text-white
+                 shadow-sm
+                 transition-colors duration-200
+                 hover:bg-[#3023bd]
+                 focus:outline-none
+                 focus:ring-2 focus:ring-[#392bd5]/30
+                 sm:w-auto sm:text-[15px]" (click)="selectUser(user.id)">
+                    Seleziona questo utente
+                </button>
+            </div>
+        </div>
+        }
+    </div>
+    }
+</div>
