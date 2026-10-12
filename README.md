@@ -126,6 +126,20 @@ docker compose logs -f backend
 
 Per fermare entrambi i container senza rimuovere il volume del database usa `docker compose down`.
 
+## Avviare demo frontend
+Per l'implementazione del frontend è stato utilizzato Angular. Per l'avvio si consiglia di utilizzare docker con il seguente comando
+
+```powershell
+docker compose up frontend -d --build
+```
+
+Il frontend esegue in modalità 'hot reload' in modo da mostare in tempo reale i cambiamenti; per poter utilizzare i comandi di angular si 
+può utilizzare il container docker (senza installare nulla nel proprio pc). Ad esempio, per generare un nuovo component: 
+
+```powershell
+docker compose exec frontend ./node_modules/.bin/ng g c <component-name>
+```
+
 ## Nota sugli embedding
 
 Cambiare modello o testo di input richiede di rigenerare **sia** gli embedding degli utenti **sia** quelli delle news. Attualmente non è presente uno script di re-embedding. Non mescolare vettori prodotti da modelli diversi.
