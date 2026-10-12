@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from datetime import datetime
+
 from datetime import datetime, timezone, timedelta
 from sqlalchemy import select
 
@@ -28,7 +30,7 @@ def get_user_notifications(
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
 
-    notifications = db.query(Notification).filter(Notification.user_id == user.id).all()
+    notifications = db.query(Notification).filter(Notification.user_id == user.id).order_by(Notification.created_at.desc()).all()
     result = list()
     for notification in notifications:
         result.append({
@@ -61,14 +63,17 @@ def get_user_last_notification(
 
     notification = db.query(Notification).filter(Notification.user_id == user.id).order_by(Notification.created_at.desc()).first()
     if notification:
-        return NotificationHelper().setup_notification_news_response(notification)
+        return {
+            "date": notification.created_at.strftime("%d-%m-%Y"),
+            "notification_news": NotificationHelper().setup_notification_news_response(notification)
+        }
     return {}
 
 @router.get("/users/{user_id}")
 def generate_user_notification(
     user_id: int,
     db: Session = Depends(get_db),
-) -> UserGeneratedNotification:
+) -> dict[str, object]:
 
     user = db.get(User, user_id)
     if user is None:
@@ -78,7 +83,7 @@ def generate_user_notification(
     if notification is None:
         raise HTTPException(status_code=500, detail="Errore imprevisto")
 
-    return notification
+    return NotificationHelper().setup_notification_news_response_from_UserGeneratedNotification(notification, datetime.now().strftime("%d-%m-%Y"))
 
 @router.get("/users")
 def generate_users_notification(

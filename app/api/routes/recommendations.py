@@ -22,7 +22,7 @@ def user_recommendations(
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
 
-    items = RecommendationService(db).top_news_for_user(user_id=user_id, top_n=top_n)
+    items = RecommendationService(db).top_news_for_user(user_id=user_id, last_notification_date=None, top_n=top_n)
     return {
         "user_id": user_id,
         "top_n": top_n,

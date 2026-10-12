@@ -11,19 +11,32 @@ from app.services.recommendation_service import RecommendationService
 
 
 class NotificationHelper:
-    def setup_notification_news_response(self, notification: Notification) -> dict[str, object]:
+    def setup_notification_news_response(self, notification: Notification) -> object:
         list_notification_news = list()
         for notification_news in notification.notification_news:
             news = notification_news.news
             list_notification_news.append({
                 "title": news.title,
                 "date": news.date.strftime("%d-%m-%Y"),
-                "summary": news.summary,
+                "summary": notification_news.summary,
                 "relevance": notification_news.relevance_user,
                 "source": news.source,
                 "link": news.link
             })
-        return {"date": notification.created_at.strftime("%d-%m-%Y"),
+        return list_notification_news
+
+    def setup_notification_news_response_from_UserGeneratedNotification(self, notification:  UserGeneratedNotification, date: str) -> dict[str, object]:
+        list_notification_news = list()
+        for news in notification.generated_news:
+            list_notification_news.append({
+                "title": news.title,
+                "date": news.date,
+                "summary": news.summary,
+                "relevance": news.relevance_user,
+                "source": news.source,
+                "link": news.link
+            })
+        return {"date": date,
                 "notification_news": list_notification_news}
 
     def generate_notification(
@@ -42,6 +55,7 @@ class NotificationHelper:
         )
 
         if last_notification is not None:
+            # Se si usa il "rimani aggiornato" (is_generate_user_notification_endpoint=True) allora si continua, altrimenti restituire None e saltare l'utente
             now = datetime.now(timezone.utc)
             next_notification_at = (
                     last_notification.created_at
@@ -49,13 +63,15 @@ class NotificationHelper:
             )
 
             if now < next_notification_at:
-                if is_generate_user_notification_endpoint:
-                    raise HTTPException(status_code=500, detail="Notifica non creata: la frequenza configurata "
-                                                                "non consente ancora una nuova notifica.")
-                else:
+                if not is_generate_user_notification_endpoint:
                     return None
 
-        items = RecommendationService(db).top_news_for_user(user_id=user_id, top_n=10)
+        last_notification_date = last_notification.created_at if last_notification else None
+
+        items = RecommendationService(db).top_news_for_user(user_id=user_id, last_notification_date=last_notification_date, top_n=10)
+
+        if is_generate_user_notification_endpoint and (items is None or items == []):
+            raise HTTPException(status_code=500, detail="Notifica non creata: non ci sono aggiornamenti rilevanti per te.")
 
         try:
             notification = GenerateNotificationService().generate_notification(user.profile_text, items)

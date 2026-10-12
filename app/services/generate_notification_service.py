@@ -33,6 +33,7 @@ class GeneratedNotificationNews(BaseModel):
     relevance_user: str
     source: str
     products: list[GeneratedProduct] = Field(default_factory=list)
+    link: str
 
 class UserGeneratedNotification(BaseModel):
     generated_news: list[GeneratedNotificationNews]
@@ -124,7 +125,8 @@ def validate_generated_notification(
                 summary=generated_news.summary,
                 relevance=generated_news.relevance,
                 relevance_user=generated_news.relevance_user,
-                source=news.link,
+                source=news.source,
+                link=news.link,
                 products=validated_products,
             )
         )
@@ -152,6 +154,7 @@ class GenerateNotificationService:
     ID: {scored_news.news.id}
     Titolo: {scored_news.news.title}
     Data: {scored_news.news.date}
+    Source: {scored_news.news.source}
     URL: {scored_news.news.link}
 
     Contenuto:
@@ -159,7 +162,7 @@ class GenerateNotificationService:
 
     ----------------------------
     """
-        
+
         products_text = ""
         for product in products:
             products_text += f"""
@@ -273,7 +276,8 @@ class GenerateNotificationService:
     Ad es. se l'utente ha interessi su AI e semiconduttori, la relevance_user potrebbe essere:
     "Questo articolo è in linea con i tuoi interessi in AI, cloud e semiconduttori: se queste trattative andranno 
     a buon fine, potrebbero accelerare gli investimenti in data center e sostenere la domanda di chip."
-    6. Il link originale dell'articolo
+    6. La source originale dell'articolo
+    7. Il link originale dell'articolo
     
     
     PROFILO DEL CLIENTE

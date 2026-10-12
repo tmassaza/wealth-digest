@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import datetime
 from dataclasses import dataclass
 
 from sqlalchemy import select
@@ -20,7 +21,7 @@ class RecommendationService:
     def __init__(self, db: Session) -> None:
         self.db = db
 
-    def top_news_for_user(self, user_id: int, top_n: int = 5) -> list[ScoredNews]:
+    def top_news_for_user(self, user_id: int, last_notification_date: datetime|None, top_n: int = 5) -> list[ScoredNews]:
         """Restituisce le notizie più vicine al profilo dell'utente con score di similarità."""
 
         user = self.db.get(User, user_id)
@@ -33,6 +34,13 @@ class RecommendationService:
         stmt = (
             select(News, cosine_similarity)
             .where(News.embedding.is_not(None))
+        )
+
+        if last_notification_date is not None:
+            stmt = stmt.where(News.date > last_notification_date)
+
+        stmt = (
+            stmt
             .order_by(cosine_distance)
             .limit(top_n)
         )
