@@ -1,5 +1,6 @@
 import { Component, Input, Output, EventEmitter} from '@angular/core';
 import { User } from '../models/user';
+import { Router } from '@angular/router';
 
 @Component({
   imports: [],
@@ -14,10 +15,15 @@ export class UserInfoCard {
   @Input() isLoading = false;
 
   @Output() generateNewNotificationEvent = new EventEmitter<void>();
-  
+
+  constructor(private router:Router) {}
 
   generateNewNotification() {
     this.generateNewNotificationEvent.emit();
+  }
+
+  seeArchive() {
+    this.router.navigate(['archive']);
   }
 
 }

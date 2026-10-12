@@ -1,0 +1,41 @@
+<div class="container">
+    <a href="home">
+        <div class="flex gap-2 items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
+                class="text-slate-800">
+                <path d="M19 12H5" />
+                <path d="M12 19l-7-7 7-7" />
+            </svg>
+            <span class="text-slate-800">Torna alla home</span>
+        </div>
+    </a>
+
+    <div class="pb-5 mt-5">
+        <h1 class="font-serif text-[25px] font-bold leading-tight 
+    text-[#17243a] sm:text-[30px]">Archivio Notifiche Ricevute
+        </h1>
+    </div>
+
+    @for (notificationData of notificationsData(); track $index) {
+
+    <div class="titles pt-5 bg-[#e8edff]/50 p-5 rounded-xl">
+        <div class="flex items-center gap-2">
+
+            <span class="h-2.5 w-2.5 shrink-0 rounded-full bg-[#4f46dc]"></span>
+            <h1 class="font-serif text-[19px] font-bold leading-tight
+                   text-[#17243a] sm:text-[20px]">
+                Notifica del {{notificationData.date}}
+            </h1>
+        </div>
+        <h3 class="text-[14px] text-slate-500 sm:text-[14px] ">
+            {{ notificationData.notification_news.length }} notizie aggregate
+        </h3>
+        <div class="mt-2 border-t border-gray-300"></div>
+        @for (notificationNews of notificationData.notification_news; track $index) {
+        <div class="pt-3"><app-news-card [news]="notificationNews"></app-news-card></div>
+        }
+    </div>
+    <div class="pt-5"></div>
+    }
+</div>

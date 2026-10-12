@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { LoginPage } from './login-page/login-page';
 import { HomePage } from './home-page/home-page';
+import { ArchivePage } from './archive-page/archive-page';
 
 export const routes: Routes = [
     {
@@ -10,5 +11,9 @@ export const routes: Routes = [
     {
         path: 'home',
         component: HomePage
+    },
+    {
+        path: 'archive',
+        component: ArchivePage
     }
 ];

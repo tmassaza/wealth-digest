@@ -14,8 +14,7 @@
 
     @if (user()) {
     <div class="pt-5">
-        <app-user-info-card [user]="user()" [isLoading]="isLoading()"
-        [notificationsCount]="notificationsCount()"
+        <app-user-info-card [user]="user()" [isLoading]="isLoading()" [notificationsCount]="notificationsCount()"
             (generateNewNotificationEvent)="generateNewNotification()"></app-user-info-card>
     </div>
     }
@@ -24,8 +23,8 @@
     <div class="mt-5 p-3 bg-red-100 border border-red-400 text-red-700 relative rounded-xl" role="alert">
         <span class="block sm:inline">{{generateNewNotificationError()}}</span>
         <span class="absolute top-0 bottom-0 right-0 px-4 py-3">
-            <svg (click)="closeErrorBanner()" class="cursor-pointer fill-current h-6 w-6 text-red-500" role="button" xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20">
+            <svg (click)="closeErrorBanner()" class="cursor-pointer fill-current h-6 w-6 text-red-500" role="button"
+                xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
                 <title>Close</title>
                 <path
                     d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z" />
@@ -40,17 +39,32 @@
                    text-[#17243a] sm:text-[20px]">
             Ultima notifica generata
         </h1>
-        <h3 class="text-[16px] text-slate-500 sm:text-[16px] ">
+        <h3 class="text-[14px] text-slate-500 sm:text-[14px] ">
             Generata il {{lastNotificationDate()}} - {{numberNotificationNews()}} notizie aggregate
         </h3>
     </div>
 
-    <div class="pt-2 border-t border-gray-200"></div>
+    <div class="mt-2 border-t border-gray-200"></div>
 
     <div class="news-section pt-3">
         @for (notificationNews of lastNotificationNews(); track $index) {
         <div class="pt-3"><app-news-card [news]="notificationNews"></app-news-card></div>
         }
+    </div>
+    }@else {
+    <div class="titles pt-5">
+        <div class="h-100 border border-gray-200 shadow-[0_2px_8px_rgba(30,41,80,0.06)] rounded-xl">
+            <div class="flex h-full flex-col items-center justify-center text-center p-3">
+                <h1 class="font-serif text-[25px] font-bold leading-tight
+                   text-[#17243a] sm:text-[30px]">
+                    Nessuna notifica generata
+                </h1>
+                <h3 class="font-serif text-[13px] leading-tight
+                   text-[#17243a] sm:text-[16px] mt-3">
+                    Non è ancora stata generata nessuna notifica. Clicca su "Rimani aggiornato" per generarla ora.
+                </h3>
+            </div>
+        </div>
     </div>
     }
 

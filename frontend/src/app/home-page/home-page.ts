@@ -72,6 +72,7 @@ export class HomePage {
           this.lastNotificationDate.set(notification.date);
           this.lastNotificationNews.set(notification.notification_news);
           this.numberNotificationNews.set(notification.notification_news.length);
+          this.notificationsCount.set(this.notificationsCount() + 1);
         }
       },
       error: (error) => {

@@ -69,7 +69,7 @@
                 Rimani aggiornato
             </button>
 
-            <button type="button" class="w-full rounded-lg
+            <button type="button" class="cursor-pointer w-full rounded-lg
                  border border-[#dfe5f5]
                  bg-[#f1f4ff]
                  px-4 py-3
@@ -78,7 +78,8 @@
                  hover:bg-[#e8edff]
                  focus:outline-none
                  focus:ring-2 focus:ring-[#392bd5]/20
-                 sm:w-auto sm:text-[15px]">
+                 sm:w-auto sm:text-[15px]"
+                 (click)="seeArchive()">
                 Tutte le notifiche ({{notificationsCount}})
             </button>
 
