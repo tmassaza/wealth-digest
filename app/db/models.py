@@ -67,3 +67,19 @@ class NotificationNews(Base):
 
     notification: Mapped["Notification"] = relationship(back_populates="notification_news")
     news: Mapped["News"] = relationship()
+
+class Product(Base):
+    """Prodotto disponibile per il matching con gli articoli."""
+
+    __tablename__ = "products"
+
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    name: Mapped[str] = mapped_column(String(255), nullable=False, unique=True)
+    theme: Mapped[str] = mapped_column(Text, nullable=False)
+    description: Mapped[str] = mapped_column(Text, nullable=False)
+    characteristics: Mapped[str] = mapped_column(Text, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+        nullable=False,
+    )

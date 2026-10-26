@@ -1,7 +1,7 @@
 import os
 import json
 from enum import Enum
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from dotenv import load_dotenv
 from google import genai
@@ -11,13 +11,18 @@ from google.genai import types
 from openai import OpenAI
 
 from app.services.recommendation_service import ScoredNews
+from app.db.models import Product
 
 load_dotenv()
 
 class LLMModel(str, Enum):
     OPENAI = "openai"
     GEMINI = "gemini"
-    
+
+class GeneratedProduct(BaseModel):
+    id: int
+    name: str
+    reason: str
 
 class GeneratedNotificationNews(BaseModel):
     id: str
@@ -27,6 +32,7 @@ class GeneratedNotificationNews(BaseModel):
     relevance: str
     relevance_user: str
     source: str
+    products: list[GeneratedProduct] = Field(default_factory=list)
 
 class UserGeneratedNotification(BaseModel):
     generated_news: list[GeneratedNotificationNews]
@@ -43,9 +49,20 @@ class InvalidGeneratedNewsError(ValueError):
 def validate_generated_notification(
     notification: UserGeneratedNotification,
     selected_news: list[ScoredNews],
+    products: list[Product],
 ) -> UserGeneratedNotification:
-    """Accetta solo news proposte al modello e ripristina i dati originali."""
-    candidates = {item.news.id: item.news for item in selected_news}
+    """Valida news e prodotti e ripristina i dati originali delle news."""
+
+    candidates = {
+        item.news.id: item.news
+        for item in selected_news
+    }
+
+    products_by_id = {
+        product.id: product
+        for product in products
+    }
+
     seen_ids: set[int] = set()
     validated_news: list[GeneratedNotificationNews] = []
 
@@ -54,18 +71,51 @@ def validate_generated_notification(
             news_id = int(generated_news.id)
         except (TypeError, ValueError) as error:
             raise InvalidGeneratedNewsError(
-                f"L'LLM ha restituito un ID di news non valido: {generated_news.id!r}."
+                f"ID news non valido: {generated_news.id!r}."
             ) from error
 
         news = candidates.get(news_id)
+
         if news is None:
             raise InvalidGeneratedNewsError(
-                f"L'LLM ha restituito la news {news_id}, non presente tra le candidate."
+                f"La news {news_id} non è tra le candidate."
             )
+
         if news_id in seen_ids:
             continue
 
         seen_ids.add(news_id)
+
+        validated_products: list[GeneratedProduct] = []
+        seen_product_ids: set[int] = set()
+
+        for generated_product in generated_news.products:
+            product_id = generated_product.id
+
+            product = products_by_id.get(product_id)
+            if product is None:
+                raise ValueError(
+                    f"Il prodotto {product_id} non esiste nel catalogo."
+                )
+
+            if product_id in seen_product_ids:
+                continue
+
+            if not generated_product.reason.strip():
+                raise ValueError(
+                    f"Motivazione mancante per il prodotto {product_id}."
+                )
+
+            seen_product_ids.add(product_id)
+
+            validated_products.append(
+                GeneratedProduct(
+                    id=product.id,
+                    name=product.name,
+                    reason=generated_product.reason,
+                )
+            )
+
         validated_news.append(
             GeneratedNotificationNews(
                 id=str(news_id),
@@ -75,17 +125,20 @@ def validate_generated_notification(
                 relevance=generated_news.relevance,
                 relevance_user=generated_news.relevance_user,
                 source=news.link,
+                products=validated_products,
             )
         )
 
-    return UserGeneratedNotification(generated_news=validated_news)
+    return UserGeneratedNotification(
+        generated_news=validated_news
+    )
 
 
 class GenerateNotificationService:
     def __init__(self):
         pass
 
-    def build_prompt(self, profile: str, selected_news: list[ScoredNews]) -> str:
+    def build_prompt(self, profile: str, selected_news: list[ScoredNews], products: list[Product],) -> str:
         """
         Costruisce il prompt da inviare al modello generativo.
         """
@@ -103,6 +156,19 @@ class GenerateNotificationService:
 
     Contenuto:
     {scored_news.news.content_text}
+
+    ----------------------------
+    """
+        
+        products_text = ""
+        for product in products:
+            products_text += f"""
+    PRODOTTO
+    ID: {product.id}
+    Nome: {product.name}
+    Tema: {product.theme}
+    Descrizione: {product.description}
+    Caratteristiche: {product.characteristics}
 
     ----------------------------
     """
@@ -161,7 +227,35 @@ class GenerateNotificationService:
     dell'articolo, l'ordine con cui gli articoli sono stati forniti
     o altri criteri non pertinenti.
     
-    FASE 2 — GENERAZIONE DELLA NOTIFICA
+     FASE 2 — ASSOCIAZIONE DEI PRODOTTI D'INVESTIMENTO
+
+    Per ogni notizia selezionata nella FASE 1, analizza il contenuto 
+    dell'articolo e individua i prodotti del catalogo della banca che presentano 
+    una relazione tematica concreta con la notizia.
+    Per ogni prodotto considera:
+    - ID e nome;
+    - tema;
+    - descrizione;
+    - caratteristiche.
+
+    Seleziona esclusivamente prodotti presenti nel catalogo fornito. Non inventare prodotti, ID o caratteristiche.
+    Per ogni prodotto selezionato restituisci:
+
+    - id: l'identificativo numerico esatto del prodotto nel catalogo;
+    - name: il nome esatto del prodotto nel catalogo;
+    - reason: una motivazione breve e specifica che spieghi il collegamento tra il contenuto dell'articolo e il prodotto.
+    
+    La motivazione deve essere basata sulle informazioni effettivamente presenti 
+    nell'articolo e nella descrizione del prodotto.
+    Non associare prodotti solo perché appartengono genericamente al settore finanziario.
+    Associa massimo tre prodotti per articolo, solo se effettivamente pertinenti.
+    Non confondere la pertinenza tematica con l'adeguatezza del prodotto per il cliente.
+    Se nessun prodotto è sufficientemente pertinente, restituisci products: [].
+    Non è necessario associare più prodotti quando uno solo è sufficiente. 
+    Non inventare associazioni per raggiungere un numero minimo.
+    Le associazioni sono esclusivamente informative e non costituiscono raccomandazioni d'investimento.
+
+    FASE 3 — GENERAZIONE DELLA NOTIFICA
     
     Per ogni notizia selezionata nella FASE 1, genera una
     notifica personalizzata.
@@ -186,6 +280,9 @@ class GenerateNotificationService:
     
     {profile}
     
+    CATALOGO DEI PRODOTTI DELLA BANCA
+
+    {products_text}
     
     ARTICOLI DISPONIBILI
     
@@ -301,10 +398,11 @@ class GenerateNotificationService:
             self,
             profile: str,
             selected_news: list[ScoredNews],
+            products: list[Product],
             llm_model: LLMModel = LLMModel.OPENAI
     ) -> UserGeneratedNotification | None:
 
-        prompt = self.build_prompt(profile, selected_news)
+        prompt = self.build_prompt(profile, selected_news, products)
 
         notification = self.run_openai(prompt) if llm_model is LLMModel.OPENAI else self.run_gemini(prompt)
-        return validate_generated_notification(notification, selected_news)
+        return validate_generated_notification(notification, selected_news, products)

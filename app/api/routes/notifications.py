@@ -1,13 +1,14 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone, timedelta
+from sqlalchemy import select
 
 from fastapi import APIRouter, Query, Depends, HTTPException
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 
 from app.db import User
-from app.db.models import Notification, NotificationNews
+from app.db.models import Notification, NotificationNews, Product
 from app.db.session import get_db
 from app.services.generate_notification_service import (
     GenerateNotificationService,
@@ -96,8 +97,10 @@ def generate_notification(
 
     items = RecommendationService(db).top_news_for_user(user_id=user_id, top_n=10)
 
+    products = db.scalars(select(Product)).all()
+
     try:
-        notification = GenerateNotificationService().generate_notification(user.profile_text, items)
+        notification = GenerateNotificationService().generate_notification(user.profile_text, items, products)
     except InvalidGeneratedNewsError as error:
         raise HTTPException(status_code=502, detail=str(error)) from error
     except Exception as e:
