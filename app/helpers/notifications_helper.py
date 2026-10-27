@@ -1,9 +1,10 @@
 from datetime import datetime, timezone, timedelta
 
 from fastapi import HTTPException, Depends
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.db.models import Notification, NotificationNews, User
+from app.db.models import Notification, NotificationNews, User, Product
 from app.db.session import get_db
 from app.services.generate_notification_service import GenerateNotificationService, InvalidGeneratedNewsError, \
     UserGeneratedNotification
@@ -70,11 +71,13 @@ class NotificationHelper:
 
         items = RecommendationService(db).top_news_for_user(user_id=user_id, last_notification_date=last_notification_date, top_n=10)
 
+        products = db.scalars(select(Product)).all()
+
         if is_generate_user_notification_endpoint and (items is None or items == []):
             raise HTTPException(status_code=500, detail="Notifica non creata: non ci sono aggiornamenti rilevanti per te.")
 
         try:
-            notification = GenerateNotificationService().generate_notification(user.profile_text, items)
+            notification = GenerateNotificationService().generate_notification(user.profile_text, items, products)
         except InvalidGeneratedNewsError as error:
             raise HTTPException(status_code=502, detail=str(error)) from error
         except Exception as e:
