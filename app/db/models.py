@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 
 from pgvector.sqlalchemy import Vector
-from sqlalchemy import DateTime, String, Text, ForeignKey
+from sqlalchemy import DateTime, String, Text, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
@@ -67,6 +67,30 @@ class NotificationNews(Base):
 
     notification: Mapped["Notification"] = relationship(back_populates="notification_news")
     news: Mapped["News"] = relationship()
+    products: Mapped[list["NotificationNewsProduct"]] = relationship(
+        back_populates="notification_news",
+        cascade="all, delete-orphan",
+        order_by="NotificationNewsProduct.id",
+    )
+
+
+class NotificationNewsProduct(Base):
+    """Prodotto associato a una news di una notifica, con motivazione specifica."""
+
+    __tablename__ = "notification_news_products"
+    __table_args__ = (
+        UniqueConstraint("notification_news_id", "product_id", name="uq_notification_news_products_pair"),
+    )
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    notification_news_id: Mapped[int] = mapped_column(
+        ForeignKey("notification_news.id", ondelete="CASCADE"), nullable=False, index=True,
+    )
+    product_id: Mapped[int] = mapped_column(ForeignKey("products.id"), nullable=False, index=True)
+    reason: Mapped[str] = mapped_column(Text, nullable=False)
+
+    notification_news: Mapped["NotificationNews"] = relationship(back_populates="products")
+    product: Mapped["Product"] = relationship()
 
 class Product(Base):
     """Prodotto disponibile per il matching con gli articoli."""

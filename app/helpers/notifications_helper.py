@@ -4,7 +4,7 @@ from fastapi import HTTPException, Depends
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.db.models import Notification, NotificationNews, User, Product
+from app.db.models import Notification, NotificationNews, NotificationNewsProduct, User, Product
 from app.db.session import get_db
 from app.services.generate_notification_service import GenerateNotificationService, InvalidGeneratedNewsError, \
     UserGeneratedNotification
@@ -22,7 +22,15 @@ class NotificationHelper:
                 "summary": notification_news.summary,
                 "relevance": notification_news.relevance_user,
                 "source": news.source,
-                "link": news.link
+                "link": news.link,
+                "products": [
+                    {
+                        "id": association.product_id,
+                        "name": association.product.name,
+                        "reason": association.reason,
+                    }
+                    for association in notification_news.products
+                ],
             })
         return list_notification_news
 
@@ -35,7 +43,8 @@ class NotificationHelper:
                 "summary": news.summary,
                 "relevance": news.relevance_user,
                 "source": news.source,
-                "link": news.link
+                "link": news.link,
+                "products": [product.model_dump() for product in news.products],
             })
         return {"date": date,
                 "notification_news": list_notification_news}
@@ -99,6 +108,13 @@ class NotificationHelper:
                         relevance=generated_news.relevance,
                         relevance_user=generated_news.relevance_user,
                         created_at=created_at,
+                        products=[
+                            NotificationNewsProduct(
+                                product_id=product.id,
+                                reason=product.reason,
+                            )
+                            for product in generated_news.products
+                        ],
                     )
                     for generated_news in notification.generated_news
                 ]
